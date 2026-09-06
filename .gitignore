@@ -1,0 +1,32 @@
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Node
+node_modules/
+dist/
+.npm/
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Test/cache output
+.pytest_cache/
+coverage/
+htmlcov/
+
+# Temporary files
+*.tmp
+*.swp
