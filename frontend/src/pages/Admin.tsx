@@ -6,24 +6,20 @@ export default function Admin() {
       className="flex min-h-screen items-center justify-center bg-[#0c202e] px-6 text-white"
       data-testid="admin-page"
     >
-      <div className="w-full max-w-lg border border-white/10 bg-white/[0.03] p-8 sm:p-10">
-        <p className="font-mono text-[10px] tracking-[0.25em] text-[#70e2db]">
-          NAUTIX / ADMIN
+      <div className="w-full max-w-sm text-center">
+        <Link to="/" className="inline-flex items-center gap-3" data-testid="admin-logo">
+          <img src="/images/nautix-logo.png" alt="Nautix" className="h-9 w-auto object-contain" />
+          <span className="font-heading text-xl font-extrabold tracking-[-0.04em]">NAUTIX</span>
+        </Link>
+        <p className="mt-8 text-sm leading-7 text-white/50">
+          Enquiries submitted through the website are delivered directly to your email.
         </p>
-
-        <h1 className="mt-6 text-3xl font-semibold tracking-[-0.04em]">
-          Administration
-        </h1>
-
-        <p className="mt-5 text-sm leading-7 text-white/60">
-          The Nautix administration interface is being restored.
-        </p>
-
         <Link
           to="/"
-          className="mt-8 inline-flex text-xs font-bold uppercase tracking-[0.14em] text-[#70e2db] hover:text-white"
+          className="mt-8 inline-flex font-mono text-[10px] tracking-[0.18em] text-[#70e2db] hover:text-white transition-colors"
+          data-testid="admin-back-link"
         >
-          Return to Nautix
+          RETURN TO NAUTIX
         </Link>
       </div>
     </main>
