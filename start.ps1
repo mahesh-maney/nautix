@@ -1,28 +1,28 @@
-# ── Nautix — Development Startup (Windows / PowerShell) ──────────────────────
+# Nautix - Development Startup (Windows / PowerShell)
 # Run with: powershell -ExecutionPolicy Bypass -File start.ps1
 
 $ErrorActionPreference = "Stop"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location $ScriptDir
 
-function ok  { param($msg) Write-Host "  " -NoNewline; Write-Host "✓" -ForegroundColor Green -NoNewline; Write-Host "  $msg" }
+function ok  { param($msg) Write-Host "  " -NoNewline; Write-Host "OK" -ForegroundColor Green -NoNewline; Write-Host "  $msg" }
 function log { param($msg) Write-Host "  $msg" }
-function err { param($msg) Write-Host "`n  ✗  $msg — aborting.`n" -ForegroundColor Red; exit 1 }
+function err { param($msg) Write-Host "`n  ERROR  $msg - aborting.`n" -ForegroundColor Red; exit 1 }
 
 Write-Host ""
 Write-Host "  NAUTIX" -ForegroundColor White -NoNewline
-Write-Host " — starting development environment"
+Write-Host " - starting development environment"
 Write-Host ""
 
-# ── Prerequisites ─────────────────────────────────────────────────────────────
+# Prerequisites
 
 if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
-    err "Node.js not found — install from https://nodejs.org (v18+)"
+    err "Node.js not found - install from https://nodejs.org (v18+)"
 }
 ok "Node.js $(node -v)"
 
 if (-not (Get-Command yarn -ErrorAction SilentlyContinue)) {
-    log "yarn not found — installing..."
+    log "yarn not found - installing..."
     npm install -g yarn --silent
 }
 ok "Yarn $(yarn -v)"
@@ -35,11 +35,11 @@ foreach ($cmd in @("python3", "python")) {
     }
 }
 if (-not $PYTHON) {
-    err "Python 3.9+ not found — install from https://python.org"
+    err "Python 3.9+ not found - install from https://python.org"
 }
 ok "Python $(& $PYTHON --version 2>&1)"
 
-# ── Install dependencies ──────────────────────────────────────────────────────
+# Install dependencies
 
 Write-Host ""
 log "Installing dependencies..."
@@ -57,7 +57,7 @@ if (-not (Test-Path $VENV)) {
 & "$VENV\Scripts\pip.exe" install -r backend\requirements.txt -q
 ok "Backend packages"
 
-# ── Load backend/.env ─────────────────────────────────────────────────────────
+# Load backend/.env
 
 if (Test-Path "backend\.env") {
     Get-Content "backend\.env" | ForEach-Object {
@@ -70,7 +70,7 @@ if (Test-Path "backend\.env") {
     ok "Loaded backend/.env"
 }
 
-# ── Start servers ─────────────────────────────────────────────────────────────
+# Start servers
 
 Write-Host ""
 log "Starting servers..."
@@ -94,8 +94,8 @@ $FrontendProc = Start-Process -FilePath "yarn" `
 
 Start-Sleep -Seconds 5
 
-if ($BackendProc.HasExited)  { err "Backend failed to start — check $BackendLog" }
-if ($FrontendProc.HasExited) { err "Frontend failed to start — check $FrontendLog" }
+if ($BackendProc.HasExited)  { err "Backend failed to start - check $BackendLog" }
+if ($FrontendProc.HasExited) { err "Frontend failed to start - check $FrontendLog" }
 
 # Detect port Vite chose
 $FrontendPort = "5173"
@@ -104,33 +104,33 @@ if (Test-Path $FrontendLog) {
     if ($match) { $FrontendPort = $match.Matches[0].Groups[1].Value }
 }
 
-# ── Ready ─────────────────────────────────────────────────────────────────────
+# Ready
 
 Write-Host ""
-Write-Host "  ┌──────────────────────────────────────────────────┐" -ForegroundColor Green
-Write-Host "  │                                                  │" -ForegroundColor Green
-Write-Host "  │  " -ForegroundColor Green -NoNewline
+Write-Host "  +--------------------------------------------------+" -ForegroundColor Green
+Write-Host "  |                                                  |" -ForegroundColor Green
+Write-Host "  |  " -ForegroundColor Green -NoNewline
 Write-Host "NAUTIX is running" -ForegroundColor White -NoNewline
-Write-Host "                             │" -ForegroundColor Green
-Write-Host "  │                                                  │" -ForegroundColor Green
-Write-Host "  │  " -ForegroundColor Green -NoNewline
+Write-Host "                             |" -ForegroundColor Green
+Write-Host "  |                                                  |" -ForegroundColor Green
+Write-Host "  |  " -ForegroundColor Green -NoNewline
 Write-Host "Website" -ForegroundColor Cyan -NoNewline
-Write-Host "  →  http://localhost:$FrontendPort           │" -ForegroundColor Green
-Write-Host "  │  " -ForegroundColor Green -NoNewline
+Write-Host "  ->  http://localhost:$FrontendPort           |" -ForegroundColor Green
+Write-Host "  |  " -ForegroundColor Green -NoNewline
 Write-Host "API docs" -ForegroundColor Cyan -NoNewline
-Write-Host " →  http://localhost:8000/docs         │" -ForegroundColor Green
-Write-Host "  │                                                  │" -ForegroundColor Green
-Write-Host "  │  Logs  →  $BackendLog" -ForegroundColor Green
-Write-Host "  │           $FrontendLog" -ForegroundColor Green
-Write-Host "  │                                                  │" -ForegroundColor Green
-Write-Host "  │  Press " -ForegroundColor Green -NoNewline
+Write-Host " ->  http://localhost:8000/docs         |" -ForegroundColor Green
+Write-Host "  |                                                  |" -ForegroundColor Green
+Write-Host "  |  Logs  ->  $BackendLog" -ForegroundColor Green
+Write-Host "  |            $FrontendLog" -ForegroundColor Green
+Write-Host "  |                                                  |" -ForegroundColor Green
+Write-Host "  |  Press " -ForegroundColor Green -NoNewline
 Write-Host "Ctrl+C" -ForegroundColor White -NoNewline
-Write-Host " to stop                           │" -ForegroundColor Green
-Write-Host "  │                                                  │" -ForegroundColor Green
-Write-Host "  └──────────────────────────────────────────────────┘" -ForegroundColor Green
+Write-Host " to stop                           |" -ForegroundColor Green
+Write-Host "  |                                                  |" -ForegroundColor Green
+Write-Host "  +--------------------------------------------------+" -ForegroundColor Green
 Write-Host ""
 
-# ── Keep running until Ctrl+C ─────────────────────────────────────────────────
+# Keep running until Ctrl+C
 
 try {
     while ($true) { Start-Sleep -Seconds 2 }
