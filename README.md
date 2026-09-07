@@ -34,10 +34,17 @@ cd nautix
 bash start.sh
 ```
 
-**Windows (PowerShell)**
+**Windows — PowerShell** (recommended)
 ```powershell
 powershell -ExecutionPolicy Bypass -File start.ps1
 ```
+
+**Windows — Git Bash**
+```bash
+bash start.sh
+```
+
+> On Windows, use PowerShell (`start.ps1`) where possible. Git Bash works too but PowerShell gives a better experience.
 
 The script will:
 - Check all prerequisites

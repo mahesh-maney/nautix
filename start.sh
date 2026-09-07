@@ -56,7 +56,17 @@ if [ ! -d "$VENV" ]; then
     log "Creating Python virtual environment..."
     $PYTHON -m venv "$VENV"
 fi
-"$VENV/bin/pip" install -r backend/requirements.txt -q
+
+# Windows (Git Bash) uses Scripts/, Unix uses bin/
+if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "win32" ]]; then
+    PIP="$VENV/Scripts/pip"
+    PYTHON_VENV="$VENV/Scripts/python"
+else
+    PIP="$VENV/bin/pip"
+    PYTHON_VENV="$VENV/bin/python"
+fi
+
+"$PIP" install -r backend/requirements.txt -q
 ok "Backend packages"
 
 # ── Load backend/.env ─────────────────────────────────────────────────────────
@@ -76,7 +86,7 @@ log "Starting servers..."
 BACKEND_LOG=/tmp/nautix-backend.log
 FRONTEND_LOG=/tmp/nautix-frontend.log
 
-"$VENV/bin/python" -m uvicorn backend.server:app --port 8000 --reload \
+"$PYTHON_VENV" -m uvicorn backend.server:app --port 8000 --reload \
     >"$BACKEND_LOG" 2>&1 &
 BACKEND_PID=$!
 
