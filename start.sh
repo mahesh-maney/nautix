@@ -102,7 +102,6 @@ echo -e "  ${G}│${N}                                                  ${G}│$
 echo -e "  ${G}│${N}  ${B}NAUTIX is running${N}                             ${G}│${N}"
 echo -e "  ${G}│${N}                                                  ${G}│${N}"
 echo -e "  ${G}│${N}  ${C}Website${N}  →  http://localhost:${FRONTEND_PORT}           ${G}│${N}"
-echo -e "  ${G}│${N}  ${C}Admin${N}    →  http://localhost:${FRONTEND_PORT}/admin      ${G}│${N}"
 echo -e "  ${G}│${N}  ${C}API docs${N} →  http://localhost:8000/docs         ${G}│${N}"
 echo -e "  ${G}│${N}                                                  ${G}│${N}"
 echo -e "  ${G}│${N}  Logs  →  $BACKEND_LOG   ${G}│${N}"
