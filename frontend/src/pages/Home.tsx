@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { ArrowUpRight, Check, ChevronRight, FileText, Menu, Minus, MoveRight, X } from "lucide-react";
+import { ArrowUpRight, Check, FileText, Menu, Minus, MoveRight, X } from "lucide-react";
 import { apiPostForm } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,16 +12,26 @@ interface ContactSubmission {
   company: string;
   email: string;
   requirement: string;
+  requirement_type: string | null;
   attachment_name: string | null;
   status: "new" | "in_review" | "complete";
   created_at: string;
 }
+
+type RequirementTypeKey =
+  | "part_reference"
+  | "specification"
+  | "drawing_datasheet"
+  | "bom"
+  | "equipment_requirement"
+  | "project_package";
 
 interface ContactFormState {
   name: string;
   company: string;
   email: string;
   requirement: string;
+  requirement_type: RequirementTypeKey | null;
   attachment: File | null;
 }
 
@@ -30,6 +40,7 @@ const initialForm: ContactFormState = {
   company: "",
   email: "",
   requirement: "",
+  requirement_type: null,
   attachment: null,
 };
 
@@ -39,7 +50,49 @@ const images = {
   fabrication: "https:" + "//static.prod-images.emergentagent.com/jobs/35ce120c-36ad-428b-959c-c3a892191cde/images/3606d0d2f83dd0e754303d17e93099d3c60bb23e5b86f16dcfbf73f338053314.jpeg",
 };
 
-const requirementForms = ["PART REFERENCE", "SPECIFICATION", "DRAWING / DATASHEET", "BOM", "EQUIPMENT REQUIREMENT", "PROJECT PACKAGE"];
+const requirementTypes: {
+  key: RequirementTypeKey;
+  label: string;
+  requirementPlaceholder: string;
+  attachmentLabel: string;
+}[] = [
+  {
+    key: "part_reference",
+    label: "PART REFERENCE",
+    requirementPlaceholder: "Include manufacturer, OEM, or part / model reference if you have it.",
+    attachmentLabel: "Attach a reference document",
+  },
+  {
+    key: "specification",
+    label: "SPECIFICATION",
+    requirementPlaceholder: "Share your specification, standard, or technical requirement.",
+    attachmentLabel: "Attach a specification document",
+  },
+  {
+    key: "drawing_datasheet",
+    label: "DRAWING / DATASHEET",
+    requirementPlaceholder: "Describe what you need — attach your drawing or datasheet below.",
+    attachmentLabel: "Attach drawing / datasheet",
+  },
+  {
+    key: "bom",
+    label: "BOM",
+    requirementPlaceholder: "Describe the scope of supply — attach your BOM below.",
+    attachmentLabel: "Attach BOM",
+  },
+  {
+    key: "equipment_requirement",
+    label: "EQUIPMENT REQUIREMENT",
+    requirementPlaceholder: "Describe the equipment, its application and any constraints.",
+    attachmentLabel: "Attach a requirement document",
+  },
+  {
+    key: "project_package",
+    label: "PROJECT PACKAGE",
+    requirementPlaceholder: "Describe the project and scope — attach any supporting documents below.",
+    attachmentLabel: "Attach supporting documents",
+  },
+];
 
 function useReveal<T extends HTMLElement>() {
   const ref = useRef<T | null>(null);
@@ -98,9 +151,16 @@ export default function Home() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [form, setForm] = useState(initialForm);
   const [submitted, setSubmitted] = useState(false);
+  const selectedType = requirementTypes.find((t) => t.key === form.requirement_type) ?? null;
   const environmentReveal = useReveal<HTMLImageElement>();
   const sourcingReveal = useReveal<HTMLImageElement>();
   const connectorReveal = useReveal<HTMLDivElement>();
+  const selectRequirementType = (key: RequirementTypeKey) => {
+    setSubmitted(false);
+    setForm((current) => ({ ...current, requirement_type: key }));
+    document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
+  };
+
   const mutation = useMutation<ContactSubmission, Error, ContactFormState>({
     mutationFn: (payload) => {
       const body = new FormData();
@@ -108,6 +168,7 @@ export default function Home() {
       body.append("company", payload.company);
       body.append("email", payload.email);
       body.append("requirement", payload.requirement);
+      if (payload.requirement_type) body.append("requirement_type", payload.requirement_type);
       if (payload.attachment) body.append("attachment", payload.attachment);
       return apiPostForm<ContactSubmission>("/contact", body);
     },
@@ -136,7 +197,10 @@ export default function Home() {
     <div className="min-h-screen overflow-hidden bg-[#f7f8f6] text-[#132c40]" data-testid="nautix-page">
       <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#0c202e]/85 text-white backdrop-blur-xl" data-testid="site-header">
         <div className="mx-auto flex h-[72px] max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-12">
-          <a href="#top" className="font-heading text-xl font-extrabold tracking-[-0.08em]" data-testid="header-logo">NAUTIX<span className="text-[#1bb8b0]">.</span></a>
+          <a href="#top" className="flex items-center gap-3" data-testid="header-logo">
+            <img src="/images/nautix-logo.png" alt="Nautix" className="h-11 w-auto object-contain" />
+            <span className="font-heading text-xl font-extrabold tracking-[-0.04em] text-white">NAUTIX</span>
+          </a>
           <nav className="hidden items-center gap-8 md:flex" aria-label="Primary navigation" data-testid="desktop-navigation">
             <a href="#practices" className="nav-link" data-testid="header-practices-link">Practices</a>
             <a href="#about" className="nav-link" data-testid="header-about-link">About</a>
@@ -203,14 +267,24 @@ export default function Home() {
                 <p className="mt-8 text-sm font-semibold text-[#132c40]/65" data-testid="requirements-support">Start with the requirement you have.</p>
               </div>
               <div className="relative grid gap-3 sm:grid-cols-2" data-testid="requirements-diagram">
-                <div className="pointer-events-none absolute left-1/2 top-1/2 hidden h-px w-[88%] -translate-x-1/2 bg-[#1bb8b0]/45 lg:block" data-testid="requirements-horizontal-connector" />
-                <div className="pointer-events-none absolute bottom-1/2 left-1/2 hidden h-[170%] w-px -translate-x-1/2 bg-[#1bb8b0]/35 lg:block" data-testid="requirements-vertical-connector" />
-                {requirementForms.map((item, index) => (
-                  <div key={item} className="group relative z-10 flex min-h-[74px] items-center justify-between border border-[#132c40]/12 bg-white px-5 transition duration-300 hover:-translate-y-1 hover:border-[#1bb8b0]" data-testid={`requirement-form-${index + 1}`}>
-                    <span className="font-mono text-[10px] tracking-[0.12em] text-[#132c40]/70" data-testid={`requirement-form-label-${index + 1}`}>{item}</span>
-                    <ChevronRight className="size-4 text-[#1bb8b0] transition-transform duration-300 group-hover:translate-x-1" />
-                  </div>
-                ))}
+                <p className="relative z-10 col-span-full mb-1 font-mono text-[9px] tracking-[0.22em] text-[#132c40]/45" data-testid="requirements-instruction">SELECT HOW YOUR REQUIREMENT STARTS</p>
+                {requirementTypes.map((item, index) => {
+                  const isSelected = form.requirement_type === item.key;
+                  return (
+                    <button
+                      key={item.key}
+                      onClick={() => selectRequirementType(item.key)}
+                      className={`group relative z-10 flex min-h-[74px] w-full cursor-pointer items-center justify-between border px-5 text-left transition duration-300 hover:-translate-y-1 hover:shadow-sm ${
+                        isSelected
+                          ? "border-[#1bb8b0] bg-[#1bb8b0]/[0.07]"
+                          : "border-[#132c40]/12 bg-white hover:border-[#1bb8b0] hover:bg-[#132c40]/[0.025]"
+                      }`}
+                      data-testid={`requirement-form-${index + 1}`}
+                    >
+                      <span className={`font-mono text-[10px] tracking-[0.12em] transition-colors duration-300 ${isSelected ? "font-bold text-[#1bb8b0]" : "text-[#132c40]/70 group-hover:text-[#132c40]"}`} data-testid={`requirement-form-label-${index + 1}`}>{item.label}</span>
+                    </button>
+                  );
+                })}
                 <div className="relative z-10 col-span-full mx-auto mt-8 flex size-32 items-center justify-center rounded-full border border-[#1bb8b0] bg-[#132c40] text-center text-xs font-bold uppercase tracking-[0.15em] text-white shadow-[0_0_0_10px_#f7f8f6,0_0_0_11px_rgba(27,184,176,.28)]" data-testid="requirements-nautix-node">NAUTIX</div>
               </div>
             </div>
@@ -304,12 +378,23 @@ export default function Home() {
               <p className="mt-16 hidden max-w-xs text-sm leading-7 text-white/45 lg:block" data-testid="contact-note">A specification, drawing, datasheet, BOM or a short description is enough to start the conversation.</p>
             </div>
             <form className="border-t border-white/20 pt-7" onSubmit={submitForm} data-testid="contact-form">
+              {selectedType && (
+                <div className="mb-7 flex items-center justify-between border border-[#1bb8b0]/35 bg-[#1bb8b0]/[0.08] px-4 py-3" data-testid="contact-requirement-type-badge">
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-[9px] tracking-[0.2em] text-[#70e2db]/70">REQUIREMENT TYPE</span>
+                    <span className="font-mono text-[10px] font-bold tracking-[0.14em] text-white">{selectedType.label}</span>
+                  </div>
+                  <button type="button" onClick={() => setForm((c) => ({ ...c, requirement_type: null }))} className="text-white/35 transition-colors hover:text-white" aria-label="Clear requirement type" data-testid="contact-requirement-type-clear">
+                    <X className="size-3.5" />
+                  </button>
+                </div>
+              )}
               <div className="grid gap-6 sm:grid-cols-2">
                 <label className="form-label" data-testid="contact-name-field"><span data-testid="contact-name-label">Name</span><Input required value={form.name} onChange={(event) => updateField("name", event.target.value)} placeholder="Your name" className="form-input" data-testid="contact-name-input" /></label>
                 <label className="form-label" data-testid="contact-company-field"><span data-testid="contact-company-label">Company</span><Input required value={form.company} onChange={(event) => updateField("company", event.target.value)} placeholder="Company name" className="form-input" data-testid="contact-company-input" /></label>
                 <label className="form-label sm:col-span-2" data-testid="contact-email-field"><span data-testid="contact-email-label">Email</span><Input required type="email" value={form.email} onChange={(event) => updateField("email", event.target.value)} placeholder="you@company.com" className="form-input" data-testid="contact-email-input" /></label>
-                <label className="form-label sm:col-span-2" data-testid="contact-requirement-field"><span data-testid="contact-requirement-label">Requirement</span><Textarea required value={form.requirement} onChange={(event) => updateField("requirement", event.target.value)} placeholder="Tell us what you are working with" className="form-input min-h-32 resize-y" data-testid="contact-requirement-input" /></label>
-                <label className="group flex cursor-pointer flex-wrap items-center gap-3 text-xs text-white/60 sm:col-span-2" data-testid="contact-attachment-field"><FileText className="size-4 text-[#70e2db]" /><span className="underline decoration-white/25 underline-offset-4" data-testid="contact-attachment-label">Attach a requirement document</span><input type="file" accept=".pdf,.png,.jpg,.jpeg,.csv,.xlsx,.docx" className="sr-only" onChange={(event) => updateAttachment(event.target.files?.[0] ?? null)} data-testid="contact-attachment-input" /><span className="truncate text-white/40" data-testid="contact-attachment-name">{form.attachment?.name || "Optional"}</span><span className="w-full pl-7 text-[10px] text-white/35" data-testid="contact-attachment-guidance">PDF, PNG, JPG, CSV, XLSX, DOCX · max 10 MB</span></label>
+                <label className="form-label sm:col-span-2" data-testid="contact-requirement-field"><span data-testid="contact-requirement-label">Requirement</span><Textarea required value={form.requirement} onChange={(event) => updateField("requirement", event.target.value)} placeholder={selectedType?.requirementPlaceholder ?? "Tell us what you are working with"} className="form-input min-h-32 resize-y" data-testid="contact-requirement-input" /></label>
+                <label className="group flex cursor-pointer flex-wrap items-center gap-3 text-xs text-white/60 sm:col-span-2" data-testid="contact-attachment-field"><FileText className="size-4 text-[#70e2db]" /><span className="underline decoration-white/25 underline-offset-4" data-testid="contact-attachment-label">{selectedType?.attachmentLabel ?? "Attach a requirement document"}</span><input type="file" accept=".pdf,.png,.jpg,.jpeg,.csv,.xlsx,.docx" className="sr-only" onChange={(event) => updateAttachment(event.target.files?.[0] ?? null)} data-testid="contact-attachment-input" /><span className="truncate text-white/40" data-testid="contact-attachment-name">{form.attachment?.name || "Optional"}</span><span className="w-full pl-7 text-[10px] text-white/35" data-testid="contact-attachment-guidance">PDF, PNG, JPG, CSV, XLSX, DOCX · max 10 MB</span></label>
               </div>
               <div className="mt-8 flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:justify-between" data-testid="contact-form-actions">
                 <Button type="submit" disabled={mutation.isPending} className="rounded-full bg-[#1bb8b0] px-6 text-[#0c202e] hover:bg-[#70e2db]" data-testid="contact-submit-button">{mutation.isPending ? "Sending…" : "Discuss a Requirement"}<ArrowRightIcon /></Button>
