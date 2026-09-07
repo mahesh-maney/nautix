@@ -75,27 +75,29 @@ if (Test-Path "backend\.env") {
 Write-Host ""
 log "Starting servers..."
 
-$BackendLog  = "$env:TEMP\nautix-backend.log"
-$FrontendLog = "$env:TEMP\nautix-frontend.log"
+$BackendLog   = "$env:TEMP\nautix-backend.log"
+$BackendErr   = "$env:TEMP\nautix-backend-err.log"
+$FrontendLog  = "$env:TEMP\nautix-frontend.log"
+$FrontendErr  = "$env:TEMP\nautix-frontend-err.log"
 
 $BackendProc = Start-Process -FilePath "$VENV\Scripts\python.exe" `
     -ArgumentList "-m uvicorn backend.server:app --port 8000 --reload" `
     -WorkingDirectory $ScriptDir `
     -RedirectStandardOutput $BackendLog `
-    -RedirectStandardError  $BackendLog `
+    -RedirectStandardError  $BackendErr `
     -NoNewWindow -PassThru
 
 $FrontendProc = Start-Process -FilePath "yarn" `
     -ArgumentList "dev" `
     -WorkingDirectory "$ScriptDir\frontend" `
     -RedirectStandardOutput $FrontendLog `
-    -RedirectStandardError  $FrontendLog `
+    -RedirectStandardError  $FrontendErr `
     -NoNewWindow -PassThru
 
 Start-Sleep -Seconds 5
 
-if ($BackendProc.HasExited)  { err "Backend failed to start - check $BackendLog" }
-if ($FrontendProc.HasExited) { err "Frontend failed to start - check $FrontendLog" }
+if ($BackendProc.HasExited)  { err "Backend failed to start - check $BackendLog and $BackendErr" }
+if ($FrontendProc.HasExited) { err "Frontend failed to start - check $FrontendLog and $FrontendErr" }
 
 # Detect port Vite chose
 $FrontendPort = "5173"
@@ -120,8 +122,8 @@ Write-Host "  |  " -ForegroundColor Green -NoNewline
 Write-Host "API docs" -ForegroundColor Cyan -NoNewline
 Write-Host " ->  http://localhost:8000/docs         |" -ForegroundColor Green
 Write-Host "  |                                                  |" -ForegroundColor Green
-Write-Host "  |  Logs  ->  $BackendLog" -ForegroundColor Green
-Write-Host "  |            $FrontendLog" -ForegroundColor Green
+Write-Host "  |  Backend  ->  $BackendLog" -ForegroundColor Green
+Write-Host "  |  Frontend ->  $FrontendLog" -ForegroundColor Green
 Write-Host "  |                                                  |" -ForegroundColor Green
 Write-Host "  |  Press " -ForegroundColor Green -NoNewline
 Write-Host "Ctrl+C" -ForegroundColor White -NoNewline
