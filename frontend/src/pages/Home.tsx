@@ -151,6 +151,7 @@ export default function Home() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [form, setForm] = useState(initialForm);
   const [submitted, setSubmitted] = useState(false);
+  const [fileError, setFileError] = useState<string | null>(null);
   const selectedType = requirementTypes.find((t) => t.key === form.requirement_type) ?? null;
   const sourcingReveal = useReveal<HTMLImageElement>();
   const connectorReveal = useReveal<HTMLDivElement>();
@@ -183,9 +184,14 @@ export default function Home() {
     setForm((current) => ({ ...current, [field]: value }));
   };
 
-  const updateAttachment = (attachment: File | null) => {
+  const updateAttachment = (file: File | null) => {
     setSubmitted(false);
-    setForm((current) => ({ ...current, attachment }));
+    if (file && file.size > 10 * 1024 * 1024) {
+      setFileError("File exceeds 10 MB. Please choose a smaller file.");
+      return;
+    }
+    setFileError(null);
+    setForm((current) => ({ ...current, attachment: file }));
   };
 
   const submitForm = (event: FormEvent<HTMLFormElement>) => {
@@ -527,6 +533,7 @@ export default function Home() {
                   <input type="file" accept=".pdf,.png,.jpg,.jpeg,.csv,.xlsx,.docx" className="sr-only" onChange={(e) => updateAttachment(e.target.files?.[0] ?? null)} data-testid="contact-attachment-input" />
                   <span className="truncate text-white/40" data-testid="contact-attachment-name">{form.attachment?.name || "Optional"}</span>
                   <span className="w-full pl-7 text-[10px] text-white/35" data-testid="contact-attachment-guidance">PDF, PNG, JPG, CSV, XLSX, DOCX · max 10 MB</span>
+                  {fileError && <span className="w-full pl-7 text-[10px] text-[#ffb4a9]" data-testid="contact-attachment-error">{fileError}</span>}
                 </label>
               </div>
               <div className="mt-8 flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:justify-between" data-testid="contact-form-actions">

@@ -1,7 +1,9 @@
+import json
 import logging
 import os
 import shutil
 import smtplib
+import time
 import uuid
 from email import encoders
 from email.mime.base import MIMEBase
@@ -9,20 +11,32 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from typing import Optional
 
-from fastapi import APIRouter, File, Form, UploadFile
+from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
 
 from backend.lib.dates import fmt, utcnow
+from backend.lib.limiter import limiter
 from backend.models.contact import ContactOut
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
-UPLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "uploads")
+# ── Directories ───────────────────────────────────────────────────────────────
+
+_BASE = os.path.dirname(os.path.dirname(__file__))
+
+UPLOAD_DIR = os.path.join(_BASE, "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-ALLOWED_EXTENSIONS = {".pdf", ".png", ".jpg", ".jpeg", ".csv", ".xlsx", ".docx"}
+FALLBACK_LOG_DIR = os.path.join(_BASE, "logs")
+os.makedirs(FALLBACK_LOG_DIR, exist_ok=True)
+FALLBACK_LOG = os.path.join(FALLBACK_LOG_DIR, "failed_submissions.jsonl")
 
-# Email config — set these as environment variables in production
+# ── Config ────────────────────────────────────────────────────────────────────
+
+ALLOWED_EXTENSIONS = {".pdf", ".png", ".jpg", ".jpeg", ".csv", ".xlsx", ".docx"}
+MAX_UPLOAD_BYTES = 10 * 1024 * 1024  # 10 MB
+UPLOAD_MAX_AGE_DAYS = int(os.getenv("UPLOAD_MAX_AGE_DAYS", "30"))
+
 SMTP_HOST = os.getenv("SMTP_HOST", "")
 SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
 SMTP_USER = os.getenv("SMTP_USER", "")
@@ -30,10 +44,52 @@ SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
 NOTIFY_EMAIL = os.getenv("NOTIFY_EMAIL", SMTP_USER)
 
 
+# ── Helpers ───────────────────────────────────────────────────────────────────
+
 def _format_type(raw: Optional[str]) -> str:
     if not raw:
         return "Not specified"
     return raw.replace("_", " ").upper()
+
+
+def _log_fallback(submission: dict, error: str) -> None:
+    """Write full submission details to a local log so no enquiry is ever lost."""
+    entry = {**submission, "fallback_reason": error, "logged_at": utcnow().isoformat()}
+    try:
+        with open(FALLBACK_LOG, "a") as f:
+            f.write(json.dumps(entry) + "\n")
+        logger.error(
+            "SMTP failure — submission saved to fallback log. "
+            "name=%s company=%s email=%s error=%s",
+            submission.get("name"),
+            submission.get("company"),
+            submission.get("email"),
+            error,
+        )
+    except Exception as log_err:
+        # Last resort: at minimum get it into the process log
+        logger.critical(
+            "SMTP failure AND fallback log write failed. "
+            "name=%s company=%s email=%s smtp_error=%s log_error=%s",
+            submission.get("name"),
+            submission.get("company"),
+            submission.get("email"),
+            error,
+            log_err,
+        )
+
+
+def _cleanup_old_uploads() -> None:
+    """Remove uploaded files older than UPLOAD_MAX_AGE_DAYS days."""
+    cutoff = time.time() - UPLOAD_MAX_AGE_DAYS * 86400
+    try:
+        for fname in os.listdir(UPLOAD_DIR):
+            fpath = os.path.join(UPLOAD_DIR, fname)
+            if os.path.isfile(fpath) and os.path.getmtime(fpath) < cutoff:
+                os.remove(fpath)
+                logger.info("Removed old upload: %s", fname)
+    except Exception as e:
+        logger.warning("Upload cleanup error: %s", e)
 
 
 def _send_email(
@@ -46,8 +102,18 @@ def _send_email(
     attachment_path: Optional[str],
     submitted_at: str,
 ) -> None:
+    submission = {
+        "name": name,
+        "company": company,
+        "email": email,
+        "requirement": requirement,
+        "requirement_type": requirement_type,
+        "attachment_name": attachment_name,
+        "submitted_at": submitted_at,
+    }
+
     if not all([SMTP_HOST, SMTP_USER, SMTP_PASSWORD, NOTIFY_EMAIL]):
-        logger.warning("SMTP not configured — skipping email notification.")
+        _log_fallback(submission, "SMTP not configured")
         return
 
     req_type = _format_type(requirement_type)
@@ -86,15 +152,22 @@ Reply directly to {email} to respond to this enquiry.
         part.add_header("Content-Disposition", f'attachment; filename="{attachment_name}"')
         msg.attach(part)
 
-    with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as smtp:
-        smtp.ehlo()
-        smtp.starttls()
-        smtp.login(SMTP_USER, SMTP_PASSWORD)
-        smtp.send_message(msg)
+    try:
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as smtp:
+            smtp.ehlo()
+            smtp.starttls()
+            smtp.login(SMTP_USER, SMTP_PASSWORD)
+            smtp.send_message(msg)
+    except Exception as e:
+        _log_fallback(submission, str(e))
 
+
+# ── Endpoint ──────────────────────────────────────────────────────────────────
 
 @router.post("/contact", response_model=ContactOut)
+@limiter.limit("5/hour")
 def submit_contact(
+    request: Request,
     name: str = Form(...),
     company: str = Form(...),
     email: str = Form(...),
@@ -102,6 +175,9 @@ def submit_contact(
     requirement_type: Optional[str] = Form(None),
     attachment: Optional[UploadFile] = File(None),
 ):
+    # Lazy cleanup of old uploads on each submission
+    _cleanup_old_uploads()
+
     submission_id = str(uuid.uuid4())
     now = utcnow()
 
@@ -110,13 +186,21 @@ def submit_contact(
 
     if attachment and attachment.filename:
         ext = os.path.splitext(attachment.filename)[1].lower()
-        if ext in ALLOWED_EXTENSIONS:
-            saved_name = f"{submission_id}{ext}"
-            file_path = os.path.join(UPLOAD_DIR, saved_name)
-            with open(file_path, "wb") as f:
-                shutil.copyfileobj(attachment.file, f)
-            attachment_name = attachment.filename
-            attachment_path = file_path
+
+        if ext not in ALLOWED_EXTENSIONS:
+            raise HTTPException(status_code=400, detail="File type not allowed.")
+
+        contents = attachment.file.read()
+        if len(contents) > MAX_UPLOAD_BYTES:
+            raise HTTPException(status_code=413, detail="File exceeds the 10 MB limit.")
+
+        saved_name = f"{submission_id}{ext}"
+        file_path = os.path.join(UPLOAD_DIR, saved_name)
+        with open(file_path, "wb") as f:
+            f.write(contents)
+
+        attachment_name = attachment.filename
+        attachment_path = file_path
 
     _send_email(
         name=name,

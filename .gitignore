@@ -30,3 +30,6 @@ htmlcov/
 # Temporary files
 *.tmp
 *.swp
+
+# Submission fallback logs (contain PII — never commit)
+backend/logs/
