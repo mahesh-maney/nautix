@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { ArrowUpRight, Check, FileText, Menu, MoveRight, X, Shield, Zap, Anchor, Headphones, Package, Settings, Tag, Ruler, Briefcase } from "lucide-react";
+import { ArrowUpRight, Check, FileText, Globe, Mail, MapPin, Menu, MoveRight, Phone, X, Shield, Zap, Anchor, Headphones, Package, Settings, Tag, Ruler, Briefcase } from "lucide-react";
 import { apiPostForm } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -551,7 +551,7 @@ export default function Home() {
       {/* ── FOOTER ─────────────────────────────────────────────────────────────── */}
       <footer className="bg-[#0f172a] py-14 text-white" data-testid="site-footer">
         <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
-          <div className="grid gap-10 md:grid-cols-[2fr_1fr_1fr]">
+          <div className="grid gap-10 md:grid-cols-[1.8fr_1fr_1fr_1.6fr]">
             <div>
               <a href="#top" className="font-heading text-2xl font-extrabold tracking-[-0.05em]" data-testid="footer-logo">NAUTI<span className="text-[#dc2626]">X.</span></a>
               <p className="mt-2 font-mono text-[9px] tracking-[0.2em] text-white/35" data-testid="footer-domain">MARINE / MARITIME / SHIPBUILDING</p>
@@ -572,9 +572,31 @@ export default function Home() {
                 <span data-testid="footer-copyright">© 2025 Nautix</span>
               </div>
             </div>
+            <div>
+              <p className="mb-4 text-[11px] font-bold uppercase tracking-[0.15em] text-white/35">Contact</p>
+              <div className="flex flex-col gap-4 text-sm text-white/65">
+                <div className="flex items-start gap-3">
+                  <MapPin className="mt-0.5 size-4 shrink-0 text-[#dc2626]" />
+                  <span className="leading-5">#222, Commander's Galaxy,<br />Agrahara Layout Main Road,<br />M S Nagar, Bengaluru – 560064,<br />Karnataka</span>
+                </div>
+                <a href="tel:9886635710" className="flex items-center gap-3 transition hover:text-[#dc2626]">
+                  <Phone className="size-4 shrink-0 text-[#dc2626]" />
+                  9886 635710
+                </a>
+                <a href="https://www.nautix.in" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 transition hover:text-[#dc2626]">
+                  <Globe className="size-4 shrink-0 text-[#dc2626]" />
+                  www.nautix.in
+                </a>
+                <a href="mailto:contact@nautix.in" className="flex items-center gap-3 transition hover:text-[#dc2626]">
+                  <Mail className="size-4 shrink-0 text-[#dc2626]" />
+                  contact@nautix.in
+                </a>
+              </div>
+            </div>
           </div>
-          <div className="mt-12 border-t border-white/10 pt-8 text-center">
+          <div className="mt-12 border-t border-white/10 pt-8 flex flex-col items-center gap-2 sm:flex-row sm:justify-between">
             <p className="text-xs text-white/25">Marine · Maritime · Shipbuilding</p>
+            <p className="text-xs text-white/25">GSTN: 29ABAFN3894J1ZQ</p>
           </div>
         </div>
       </footer>
