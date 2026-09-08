@@ -583,10 +583,10 @@ export default function Home() {
                   <Phone className="size-4 shrink-0 text-[#dc2626]" />
                   +91 9886 635710
                 </a>
-                <a href="https://www.nautix.in" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 transition hover:text-[#dc2626]">
+                <div className="flex items-center gap-3">
                   <Globe className="size-4 shrink-0 text-[#dc2626]" />
-                  www.nautix.in
-                </a>
+                  <span>GSTN: 29ABAFN3894J1ZQ</span>
+                </div>
                 <a href="mailto:contact@nautix.in" className="flex items-center gap-3 transition hover:text-[#dc2626]">
                   <Mail className="size-4 shrink-0 text-[#dc2626]" />
                   contact@nautix.in
@@ -594,9 +594,8 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <div className="mt-12 border-t border-white/10 pt-8 flex flex-col items-center gap-2 sm:flex-row sm:justify-between">
+          <div className="mt-12 border-t border-white/10 pt-8 text-center">
             <p className="text-xs text-white/25">Marine · Maritime · Shipbuilding</p>
-            <p className="text-xs text-white/25">GSTN: 29ABAFN3894J1ZQ</p>
           </div>
         </div>
       </footer>
