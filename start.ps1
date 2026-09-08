@@ -75,29 +75,23 @@ if (Test-Path "backend\.env") {
 Write-Host ""
 log "Starting servers..."
 
-$BackendLog   = "$env:TEMP\nautix-backend.log"
-$BackendErr   = "$env:TEMP\nautix-backend-err.log"
-$FrontendLog  = "$env:TEMP\nautix-frontend.log"
-$FrontendErr  = "$env:TEMP\nautix-frontend-err.log"
+$BackendLog  = "$env:TEMP\nautix-backend.log"
+$FrontendLog = "$env:TEMP\nautix-frontend.log"
 
-$BackendProc = Start-Process -FilePath "$VENV\Scripts\python.exe" `
-    -ArgumentList "-m uvicorn backend.server:app --port 8000 --reload" `
+$BackendProc = Start-Process -FilePath "cmd.exe" `
+    -ArgumentList "/c", "`"$VENV\Scripts\python.exe`" -m uvicorn backend.server:app --port 8000 --reload >> `"$BackendLog`" 2>&1" `
     -WorkingDirectory $ScriptDir `
-    -RedirectStandardOutput $BackendLog `
-    -RedirectStandardError  $BackendErr `
-    -NoNewWindow -PassThru
+    -WindowStyle Hidden -PassThru
 
-$FrontendProc = Start-Process -FilePath "yarn" `
-    -ArgumentList "dev" `
+$FrontendProc = Start-Process -FilePath "cmd.exe" `
+    -ArgumentList "/c", "yarn dev >> `"$FrontendLog`" 2>&1" `
     -WorkingDirectory "$ScriptDir\frontend" `
-    -RedirectStandardOutput $FrontendLog `
-    -RedirectStandardError  $FrontendErr `
-    -NoNewWindow -PassThru
+    -WindowStyle Hidden -PassThru
 
 Start-Sleep -Seconds 5
 
-if ($BackendProc.HasExited)  { err "Backend failed to start - check $BackendLog and $BackendErr" }
-if ($FrontendProc.HasExited) { err "Frontend failed to start - check $FrontendLog and $FrontendErr" }
+if ($BackendProc.HasExited)  { err "Backend failed to start - check $BackendLog" }
+if ($FrontendProc.HasExited) { err "Frontend failed to start - check $FrontendLog" }
 
 # Detect port Vite chose
 $FrontendPort = "5173"
