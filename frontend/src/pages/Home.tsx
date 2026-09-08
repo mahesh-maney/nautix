@@ -456,7 +456,7 @@ export default function Home() {
             </div>
             <div className="rounded-xl border border-[#e5e7eb] bg-white p-8 shadow-sm" data-testid="technology-disciplines">
               <div className="grid">
-                {["Custom Software", "Systems Integration", "Operational Applications"].map((item, index) => (
+                {["Custom Software", "Systems Integration", "Marine Stores", "Operational Equipment", "Accessories & Consumables"].map((item, index) => (
                   <div className="border-b border-[#f1f5f9] py-5 last:border-b-0" key={item} data-testid={`technology-discipline-${index + 1}`}>
                     <span className="text-base font-semibold text-[#0f172a]" data-testid={`technology-discipline-label-${index + 1}`}>{item}</span>
                   </div>
