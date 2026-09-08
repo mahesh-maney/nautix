@@ -78,10 +78,14 @@ log "Starting servers..."
 $BackendLog  = "$env:TEMP\nautix-backend.log"
 $FrontendLog = "$env:TEMP\nautix-frontend.log"
 
+# Resolve the full path to yarn so the child powershell process can find it
+# even if the user npm bin directory is only in the profile-set PATH.
+$YarnExe = (Get-Command yarn).Source
+
 # Build inner command strings — outer variables expand here, inner single-quotes
 # protect paths with spaces when the child powershell.exe runs the command.
 $backendCmd  = "Set-Location '$ScriptDir'; & '$VENV\Scripts\python.exe' -m uvicorn backend.server:app --port 8000 --reload *>> '$BackendLog'"
-$frontendCmd = "Set-Location '$ScriptDir\frontend'; yarn dev *>> '$FrontendLog'"
+$frontendCmd = "Set-Location '$ScriptDir\frontend'; & '$YarnExe' dev *>> '$FrontendLog'"
 
 # Launch each server in a hidden powershell child process.
 # Using a powershell subprocess avoids the PS 5.1 Start-Process bug where
