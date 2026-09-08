@@ -78,17 +78,24 @@ log "Starting servers..."
 $BackendLog  = "$env:TEMP\nautix-backend.log"
 $FrontendLog = "$env:TEMP\nautix-frontend.log"
 
-$BackendProc = Start-Process -FilePath "cmd.exe" `
-    -ArgumentList "/c", "`"$VENV\Scripts\python.exe`" -m uvicorn backend.server:app --port 8000 --reload >> `"$BackendLog`" 2>&1" `
-    -WorkingDirectory $ScriptDir `
+# Build inner command strings — outer variables expand here, inner single-quotes
+# protect paths with spaces when the child powershell.exe runs the command.
+$backendCmd  = "Set-Location '$ScriptDir'; & '$VENV\Scripts\python.exe' -m uvicorn backend.server:app --port 8000 --reload *>> '$BackendLog'"
+$frontendCmd = "Set-Location '$ScriptDir\frontend'; yarn dev *>> '$FrontendLog'"
+
+# Launch each server in a hidden powershell child process.
+# Using a powershell subprocess avoids the PS 5.1 Start-Process bug where
+# -RedirectStandardOutput and -RedirectStandardError throw "are same" even
+# with distinct paths. The *>> operator captures all output streams reliably.
+$BackendProc = Start-Process powershell.exe `
+    -ArgumentList "-NoProfile", "-Command", $backendCmd `
     -WindowStyle Hidden -PassThru
 
-$FrontendProc = Start-Process -FilePath "cmd.exe" `
-    -ArgumentList "/c", "yarn dev >> `"$FrontendLog`" 2>&1" `
-    -WorkingDirectory "$ScriptDir\frontend" `
+$FrontendProc = Start-Process powershell.exe `
+    -ArgumentList "-NoProfile", "-Command", $frontendCmd `
     -WindowStyle Hidden -PassThru
 
-Start-Sleep -Seconds 5
+Start-Sleep -Seconds 6
 
 if ($BackendProc.HasExited)  { err "Backend failed to start - check $BackendLog" }
 if ($FrontendProc.HasExited) { err "Frontend failed to start - check $FrontendLog" }
@@ -133,7 +140,7 @@ try {
 } finally {
     Write-Host ""
     log "Stopping servers..."
-    if (-not $BackendProc.HasExited)  { Stop-Process -Id $BackendProc.Id  -Force -ErrorAction SilentlyContinue }
-    if (-not $FrontendProc.HasExited) { Stop-Process -Id $FrontendProc.Id -Force -ErrorAction SilentlyContinue }
+    if (-not $BackendProc.HasExited)  { taskkill /F /T /PID $BackendProc.Id  2>$null | Out-Null }
+    if (-not $FrontendProc.HasExited) { taskkill /F /T /PID $FrontendProc.Id 2>$null | Out-Null }
     Write-Host ""
 }
