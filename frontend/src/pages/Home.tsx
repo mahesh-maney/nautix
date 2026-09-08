@@ -309,7 +309,7 @@ export default function Home() {
         </section>
 
         {/* ── ENVIRONMENT · SERVICES · SOURCING · SPECIFICATION ──────────────────── */}
-        <section id="about" className="bg-[#f8fafc] py-10 sm:py-12 lg:py-14">
+        <section id="about" className="bg-[#f8fafc] py-6 sm:py-8 lg:py-10">
           <span id="practices" />
           <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
 
@@ -431,7 +431,7 @@ export default function Home() {
         </section>
 
         {/* ── TRANSITION ─────────────────────────────────────────────────────────── */}
-        <section className="bg-white py-10 sm:py-12 lg:py-14" data-testid="transition-section">
+        <section className="bg-white py-6 sm:py-8 lg:py-10" data-testid="transition-section">
           <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
             <div className="ml-auto max-w-3xl border-l-4 border-[#dc2626] pl-8 sm:pl-12" data-testid="transition-copy">
               <SectionMarker number="06" label="A WIDER REQUIREMENT" />
@@ -444,7 +444,7 @@ export default function Home() {
         </section>
 
         {/* ── TECHNOLOGY PRACTICE ────────────────────────────────────────────────── */}
-        <section className="bg-[#f8fafc] py-10 sm:py-12 lg:py-14" data-testid="technology-practice-section">
+        <section className="bg-[#f8fafc] py-6 sm:py-8 lg:py-10" data-testid="technology-practice-section">
           <div className="mx-auto grid max-w-[1440px] gap-16 px-5 sm:px-8 lg:grid-cols-[1fr_1.2fr] lg:gap-24 lg:px-12">
             <div>
               <SectionMarker number="07" label="PRACTICE 02" />
@@ -473,7 +473,7 @@ export default function Home() {
         </section>
 
         {/* ── SUMMARY ────────────────────────────────────────────────────────────── */}
-        <section className="bg-white py-10 sm:py-12 lg:py-14" data-testid="summary-section">
+        <section className="bg-white py-6 sm:py-8 lg:py-10" data-testid="summary-section">
           <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
             <SectionMarker number="08" label="TWO PRACTICES / ONE DOMAIN" />
             <h2 className="mt-6 max-w-3xl font-heading text-[clamp(2.4rem,6vw,5rem)] font-extrabold leading-[.92] tracking-[-0.04em] text-[#0f172a]" data-testid="summary-headline">
@@ -497,7 +497,7 @@ export default function Home() {
         </section>
 
         {/* ── CONTACT ────────────────────────────────────────────────────────────── */}
-        <section id="contact" className="bg-[#7f1d1d] py-10 text-white sm:py-12 lg:py-14" data-testid="contact-section">
+        <section id="contact" className="bg-[#7f1d1d] py-6 text-white sm:py-8 lg:py-10" data-testid="contact-section">
           <div className="mx-auto grid max-w-[1440px] gap-16 px-5 sm:px-8 lg:grid-cols-[.9fr_1.1fr] lg:gap-24 lg:px-12">
             <div data-testid="contact-intro">
               <SectionMarker number="09" label="START A CONVERSATION" light />
