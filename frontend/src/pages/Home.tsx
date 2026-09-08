@@ -390,7 +390,7 @@ export default function Home() {
                     <button
                       key={item.key}
                       onClick={() => selectRequirementType(item.key)}
-                      className={`group flex flex-col gap-4 rounded-xl border-2 bg-white p-5 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${
+                      className={`group flex flex-col gap-4 rounded-xl border-2 bg-white p-5 text-left shadow transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${
                         isSelected ? "border-[#dc2626] shadow-[#dc2626]/10" : "border-transparent hover:border-[#dc2626]/25"
                       }`}
                       data-testid={`requirement-form-${index + 1}`}
