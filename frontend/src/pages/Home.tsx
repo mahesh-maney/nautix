@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { ArrowUpRight, Check, FileText, Menu, Minus, MoveRight, X } from "lucide-react";
+import { ArrowUpRight, Check, FileText, Menu, Minus, MoveRight, X, Shield, Zap, Anchor, Headphones, Package, Settings, Tag, Ruler, Briefcase } from "lucide-react";
 import { apiPostForm } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -94,6 +94,15 @@ const requirementTypes: {
   },
 ];
 
+const requirementIcons: Record<RequirementTypeKey, React.ComponentType<{ className?: string }>> = {
+  part_reference: Tag,
+  specification: FileText,
+  drawing_datasheet: Ruler,
+  bom: Package,
+  equipment_requirement: Settings,
+  project_package: Briefcase,
+};
+
 function useReveal<T extends HTMLElement>() {
   const ref = useRef<T | null>(null);
   const [visible, setVisible] = useState(false);
@@ -128,22 +137,13 @@ function useReveal<T extends HTMLElement>() {
   return { ref, visible };
 }
 
-function SectionMarker({ number, label }: { number: string; label: string }) {
+function SectionMarker({ number, label, light = false }: { number: string; label: string; light?: boolean }) {
   return (
-    <div className="flex items-center gap-3" data-testid={`section-marker-${number}`}>
-      <span className="font-mono text-[10px] tracking-[0.24em] text-[#1bb8b0]" data-testid={`section-marker-number-${number}`}>{number}</span>
-      <span className="h-px w-8 bg-[#1bb8b0]/50" data-testid={`section-marker-line-${number}`} />
-      <span className="font-mono text-[10px] tracking-[0.2em] text-current/55" data-testid={`section-marker-label-${number}`}>{label}</span>
+    <div className="flex items-center gap-2" data-testid={`section-marker-${number}`}>
+      <span className={`h-0.5 w-5 ${light ? "bg-[#fca5a5]" : "bg-[#dc2626]"}`} data-testid={`section-marker-line-${number}`} />
+      <span className={`text-[11px] font-bold uppercase tracking-[0.22em] ${light ? "text-[#fca5a5]" : "text-[#dc2626]"}`} data-testid={`section-marker-label-${number}`}>{label}</span>
+      <span className="sr-only" data-testid={`section-marker-number-${number}`}>{number}</span>
     </div>
-  );
-}
-
-function ArrowLink({ children, href, light = false, testId }: { children: string; href: string; light?: boolean; testId: string }) {
-  return (
-    <a href={href} className={`group inline-flex items-center gap-3 border-b pb-2 text-xs font-bold uppercase tracking-[0.18em] transition-colors duration-300 ${light ? "border-white/35 text-white hover:border-[#1bb8b0]" : "border-[#132c40]/30 text-[#132c40] hover:border-[#1bb8b0]"}`} data-testid={testId}>
-      {children}
-      <MoveRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
-    </a>
   );
 }
 
@@ -155,6 +155,7 @@ export default function Home() {
   const environmentReveal = useReveal<HTMLImageElement>();
   const sourcingReveal = useReveal<HTMLImageElement>();
   const connectorReveal = useReveal<HTMLDivElement>();
+
   const selectRequirementType = (key: RequirementTypeKey) => {
     setSubmitted(false);
     setForm((current) => ({ ...current, requirement_type: key }));
@@ -194,26 +195,30 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen overflow-hidden bg-[#f7f8f6] text-[#132c40]" data-testid="nautix-page">
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#0c202e]/85 text-white backdrop-blur-xl" data-testid="site-header">
+    <div className="min-h-screen overflow-hidden bg-white text-[#0f172a]" data-testid="nautix-page">
+
+      {/* ── HEADER ─────────────────────────────────────────────────────────────── */}
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-gray-100 bg-white shadow-sm" data-testid="site-header">
         <div className="mx-auto flex h-[72px] max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-12">
-          <a href="#top" className="flex items-center gap-3" data-testid="header-logo">
-            <img src="/images/nautix-logo.png" alt="Nautix" className="h-11 w-auto object-contain" />
-            <span className="font-heading text-xl font-extrabold tracking-[-0.04em] text-white">NAUTIX</span>
+          <a href="#top" className="flex items-center gap-2.5" data-testid="header-logo">
+            <img src="/images/nautix-logo.png" alt="Nautix" className="h-9 w-auto object-contain" />
+            <span className="font-heading text-xl font-extrabold tracking-[-0.04em] text-[#0f172a]">NAUTIX</span>
           </a>
           <nav className="hidden items-center gap-8 md:flex" aria-label="Primary navigation" data-testid="desktop-navigation">
-            <a href="#practices" className="nav-link" data-testid="header-practices-link">Practices</a>
-            <a href="#about" className="nav-link" data-testid="header-about-link">About</a>
-            <a href="#contact" className="nav-link" data-testid="header-contact-link">Contact</a>
+            <a href="#practices" className="relative text-[13px] font-semibold text-[#374151] transition-colors after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:bg-[#dc2626] after:transition-all hover:text-[#dc2626] hover:after:w-full" data-testid="header-practices-link">Practices</a>
+            <a href="#about" className="relative text-[13px] font-semibold text-[#374151] transition-colors after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:bg-[#dc2626] after:transition-all hover:text-[#dc2626] hover:after:w-full" data-testid="header-about-link">About</a>
+            <a href="#contact" className="relative text-[13px] font-semibold text-[#374151] transition-colors after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:bg-[#dc2626] after:transition-all hover:text-[#dc2626] hover:after:w-full" data-testid="header-contact-link">Contact</a>
           </nav>
-          <a href="#contact" className="hidden items-center gap-2 rounded-full border border-white/25 px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.16em] transition hover:border-[#1bb8b0] hover:text-[#70e2db] sm:flex" data-testid="header-cta">Discuss a Requirement <ArrowUpRight className="size-3.5" /></a>
-          <button className="rounded-full border border-white/20 p-2 md:hidden" onClick={() => setMobileOpen((open) => !open)} aria-label="Toggle navigation" data-testid="mobile-navigation-toggle">
-            {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+          <a href="#contact" className="hidden items-center gap-2 rounded bg-[#dc2626] px-5 py-2.5 text-[12px] font-bold uppercase tracking-[0.1em] text-white transition hover:bg-[#b91c1c] sm:flex" data-testid="header-cta">
+            Get In Touch <ArrowUpRight className="size-3.5" />
+          </a>
+          <button className="rounded border border-gray-200 p-2 md:hidden" onClick={() => setMobileOpen((o) => !o)} aria-label="Toggle navigation" data-testid="mobile-navigation-toggle">
+            {mobileOpen ? <X className="size-5 text-[#0f172a]" /> : <Menu className="size-5 text-[#0f172a]" />}
           </button>
         </div>
         {mobileOpen && (
-          <nav className="border-t border-white/10 bg-[#0c202e] px-5 py-5 md:hidden" aria-label="Mobile navigation" data-testid="mobile-navigation">
-            <div className="flex flex-col gap-5 text-sm">
+          <nav className="border-t border-gray-100 bg-white px-5 py-5 md:hidden" aria-label="Mobile navigation" data-testid="mobile-navigation">
+            <div className="flex flex-col gap-5 text-sm font-semibold text-[#374151]">
               <a href="#practices" onClick={() => setMobileOpen(false)} data-testid="mobile-practices-link">Practices</a>
               <a href="#about" onClick={() => setMobileOpen(false)} data-testid="mobile-about-link">About</a>
               <a href="#contact" onClick={() => setMobileOpen(false)} data-testid="mobile-contact-link">Contact</a>
@@ -223,165 +228,294 @@ export default function Home() {
       </header>
 
       <main id="top">
-        <section className="relative flex min-h-[720px] items-end bg-[#0c202e] text-white sm:min-h-[800px]" data-testid="hero-section">
-          <img src={images.hero} alt="Vessel under construction in a shipyard dry dock" className="absolute inset-0 size-full object-cover opacity-65" data-testid="hero-image" />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,25,37,.96)_0%,rgba(8,25,37,.73)_42%,rgba(8,25,37,.15)_100%)]" data-testid="hero-overlay" />
-          <div className="relative mx-auto w-full max-w-[1440px] px-5 pb-20 pt-40 sm:px-8 sm:pb-24 lg:px-12 lg:pb-28">
-            <div className="max-w-3xl" data-testid="hero-content">
-              <p className="mb-7 font-mono text-[10px] tracking-[0.3em] text-[#70e2db]" data-testid="hero-eyebrow">MARINE / MARITIME / SHIPBUILDING</p>
-              <h1 className="max-w-2xl font-heading text-[clamp(3.6rem,10vw,8rem)] font-semibold leading-[.88] tracking-[-0.08em]" data-testid="hero-title">NAUTIX</h1>
-              <div className="mt-10 grid max-w-2xl gap-8 border-l border-[#1bb8b0] pl-5 sm:pl-7">
-                <h2 className="font-heading text-[clamp(1.8rem,4vw,3.4rem)] font-medium leading-[1.02] tracking-[-0.055em]" data-testid="hero-headline">Marine requirements are rarely simple.</h2>
-                <p className="max-w-lg text-sm leading-7 text-white/65 sm:text-base" data-testid="hero-copy">Equipment, systems and operations come with specifications, dependencies and constraints that demand more than a catalogue search.</p>
-                <p className="max-w-md text-sm font-semibold leading-7 text-white" data-testid="hero-positioning">Nautix is built around understanding and solving those requirements.</p>
-              </div>
-              <div className="mt-10" data-testid="hero-cta-wrap"><ArrowLink href="#about" light testId="hero-explore-link">Explore Nautix</ArrowLink></div>
+
+        {/* ── HERO ───────────────────────────────────────────────────────────────── */}
+        <section className="relative flex min-h-[720px] items-center overflow-hidden bg-white pt-[72px] sm:min-h-[800px]" data-testid="hero-section">
+          {/* Right image panel with geometric red overlay */}
+          <div className="absolute right-0 top-0 hidden h-full w-[48%] overflow-hidden lg:block">
+            <img src={images.hero} alt="Vessel under construction in a shipyard dry dock" className="h-full w-full object-cover" data-testid="hero-image" />
+            <div className="absolute inset-0 bg-[#0f172a]/40" data-testid="hero-overlay" />
+            {/* Red diagonal left edge */}
+            <div className="absolute inset-0 bg-[#dc2626] [clip-path:polygon(0_0,20%_0,0_100%)]" />
+            {/* Floating stats card */}
+            <div className="absolute bottom-12 right-8 rounded-xl bg-white p-5 shadow-2xl">
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#dc2626]">Marine Specialists</p>
+              <p className="mt-2 text-sm font-bold text-[#0f172a]">Requirement-Led</p>
+              <p className="text-sm font-semibold text-[#374151]">Procurement &amp; Technology</p>
             </div>
           </div>
-          <div className="absolute bottom-7 right-5 hidden items-center gap-4 font-mono text-[9px] tracking-[0.22em] text-white/45 lg:flex" data-testid="hero-index"><span>01</span><span className="h-px w-14 bg-white/30" /><span>REQUIREMENTS, UNDERSTOOD</span></div>
+
+          {/* Dot grid decoration */}
+          <div className="absolute bottom-10 right-[52%] mr-8 hidden lg:grid" style={{ gridTemplateColumns: "repeat(6, 1fr)", gap: "7px" }}>
+            {Array.from({ length: 24 }).map((_, i) => (
+              <span key={i} className="size-1 rounded-full bg-[#dc2626]/20" />
+            ))}
+          </div>
+
+          {/* Left content */}
+          <div className="relative z-10 mx-auto w-full max-w-[1440px] px-5 py-24 sm:px-8 lg:px-12">
+            <div className="max-w-xl" data-testid="hero-content">
+              <p className="mb-6 flex items-center gap-2.5 font-mono text-[10px] font-bold tracking-[0.28em] text-[#dc2626]" data-testid="hero-eyebrow">
+                <span className="h-px w-6 bg-[#dc2626]" />
+                MARINE / MARITIME / SHIPBUILDING
+              </p>
+              <h1 className="font-heading text-[clamp(2.8rem,6.5vw,5.2rem)] font-extrabold leading-[.9] tracking-[-0.04em] text-[#0f172a]" data-testid="hero-title">
+                We Solve<br />Marine Requirements
+              </h1>
+              <p className="font-heading text-[clamp(2.8rem,6.5vw,5.2rem)] font-extrabold leading-[.9] tracking-[-0.04em] text-[#dc2626]" data-testid="hero-headline">
+                With Precision.
+              </p>
+              <p className="mt-7 max-w-md text-[15px] leading-7 text-[#6b7280]" data-testid="hero-copy">
+                Equipment, systems and operations come with specifications, dependencies and constraints that demand more than a catalogue search.
+              </p>
+              <p className="mt-3 max-w-md text-[15px] font-semibold text-[#0f172a]" data-testid="hero-positioning">
+                Nautix is built around understanding and solving those requirements.
+              </p>
+              <div className="mt-9 flex flex-wrap items-center gap-4" data-testid="hero-cta-wrap">
+                <a href="#practices" className="inline-flex items-center gap-2.5 rounded bg-[#dc2626] px-6 py-3.5 text-sm font-bold text-white transition hover:bg-[#b91c1c]" data-testid="hero-explore-link">
+                  Explore Practices <MoveRight className="size-4" />
+                </a>
+                <a href="#contact" className="inline-flex items-center gap-2 rounded border-2 border-[#0f172a] px-6 py-3.5 text-sm font-bold text-[#0f172a] transition hover:border-[#dc2626] hover:text-[#dc2626]">
+                  Discuss a Requirement
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div className="absolute bottom-7 right-5 hidden items-center gap-4 font-mono text-[9px] tracking-[0.22em] text-[#0f172a]/30 lg:flex" data-testid="hero-index">
+            <span>01</span><span className="h-px w-14 bg-[#0f172a]/15" /><span>REQUIREMENTS, UNDERSTOOD</span>
+          </div>
         </section>
 
-        <section id="about" className="relative bg-[#eef1ef] py-24 sm:py-32 lg:py-40" data-testid="environment-section">
-          <div className="mx-auto grid max-w-[1440px] items-center gap-14 px-5 sm:px-8 lg:grid-cols-[.8fr_1.2fr] lg:gap-24 lg:px-12">
+        {/* ── STATS BAND ─────────────────────────────────────────────────────────── */}
+        <section className="bg-[#dc2626] py-10 text-white">
+          <div className="mx-auto grid max-w-[1440px] grid-cols-2 gap-8 px-5 sm:px-8 md:grid-cols-4 lg:px-12">
+            {[
+              { Icon: Shield,     title: "Quality",         sub: "Marine-grade expertise"     },
+              { Icon: Zap,        title: "Performance",     sub: "Requirement-led approach"   },
+              { Icon: Anchor,     title: "Maritime Focus",  sub: "Shipbuilding & offshore"    },
+              { Icon: Headphones, title: "Support",         sub: "Requirement to delivery"    },
+            ].map(({ Icon, title, sub }) => (
+              <div key={title} className="flex items-start gap-4">
+                <div className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-white/20">
+                  <Icon className="size-5" />
+                </div>
+                <div>
+                  <p className="font-bold">{title}</p>
+                  <p className="mt-0.5 text-sm text-white/80">{sub}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ── ABOUT / ENVIRONMENT ────────────────────────────────────────────────── */}
+        <section id="about" className="bg-white py-24 sm:py-32 lg:py-40" data-testid="environment-section">
+          <div className="mx-auto grid max-w-[1440px] items-center gap-14 px-5 sm:px-8 lg:grid-cols-[1fr_1.1fr] lg:gap-24 lg:px-12">
             <div data-testid="environment-copy">
               <SectionMarker number="02" label="THE MARINE ENVIRONMENT" />
-              <h2 className="mt-8 max-w-xl font-heading text-[clamp(2.7rem,6vw,5.4rem)] font-medium leading-[.97] tracking-[-0.07em]" data-testid="environment-headline">Built around the marine environment.</h2>
-              <p className="mt-8 max-w-md text-sm leading-7 text-[#132c40]/65" data-testid="environment-audience">Shipyards. Vessel owners and operators. Ports. Offshore businesses. Marine contractors. Ship-management companies.</p>
-              <p className="mt-5 max-w-sm text-base font-semibold leading-7 text-[#132c40]" data-testid="environment-support">Different operations. Different requirements. One demanding environment.</p>
+              <h2 className="mt-6 max-w-xl font-heading text-[clamp(2.2rem,5vw,4rem)] font-extrabold leading-[.95] tracking-[-0.04em] text-[#0f172a]" data-testid="environment-headline">
+                Built Around the<br /><span className="text-[#dc2626]">Marine Environment.</span>
+              </h2>
+              <p className="mt-7 max-w-md text-[15px] leading-7 text-[#6b7280]" data-testid="environment-audience">
+                Shipyards. Vessel owners and operators. Ports. Offshore businesses. Marine contractors. Ship-management companies.
+              </p>
+              <p className="mt-5 max-w-sm text-base font-bold text-[#0f172a]" data-testid="environment-support">
+                Different operations. Different requirements. One demanding environment.
+              </p>
+              <a href="#contact" className="mt-8 inline-flex items-center gap-2 rounded bg-[#dc2626] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#b91c1c]">
+                Get In Touch <ArrowUpRight className="size-4" />
+              </a>
             </div>
-            <div className="relative min-h-[420px] overflow-hidden bg-[#132c40] sm:min-h-[540px]" data-testid="environment-image-frame">
+            <div className="relative min-h-[420px] overflow-hidden rounded-xl shadow-xl sm:min-h-[520px]" data-testid="environment-image-frame">
               <img ref={environmentReveal.ref} src={images.engineRoom} alt="Engineers working around machinery in a vessel engine room" className={`absolute inset-0 size-full object-cover transition duration-700 hover:scale-105 reveal-image ${environmentReveal.visible ? "is-visible" : ""}`} data-testid="environment-image" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#081923]/80 via-transparent to-transparent" />
-              <span className="absolute bottom-6 left-6 font-mono text-[9px] tracking-[0.25em] text-white/70" data-testid="environment-image-caption">VESSEL SYSTEMS / ENGINE ROOM</span>
-              <div className="absolute -bottom-1 right-0 h-24 w-24 border-l border-t border-[#1bb8b0]/70" data-testid="environment-corner-detail" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a]/60 via-transparent to-transparent" />
+              <div className="absolute left-0 top-0 h-full w-1.5 bg-[#dc2626]" data-testid="environment-corner-detail" />
+              <span className="absolute bottom-6 left-7 font-mono text-[9px] tracking-[0.25em] text-white/80" data-testid="environment-image-caption">VESSEL SYSTEMS / ENGINE ROOM</span>
             </div>
           </div>
         </section>
 
-        <section className="bg-[#f7f8f6] py-24 sm:py-32 lg:py-40" data-testid="requirements-section">
+        {/* ── REQUIREMENTS / SERVICES ────────────────────────────────────────────── */}
+        <section className="bg-[#f8fafc] py-24 sm:py-32 lg:py-40" data-testid="requirements-section">
           <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
-            <div className="grid gap-14 lg:grid-cols-[.7fr_1.3fr] lg:gap-24">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <SectionMarker number="03" label="THE STARTING POINT" />
-                <h2 className="mt-8 max-w-lg font-heading text-[clamp(2.7rem,6vw,5.3rem)] font-medium leading-[.97] tracking-[-0.07em]" data-testid="requirements-headline">Requirements arrive in different forms.</h2>
-                <p className="mt-8 text-sm font-semibold text-[#132c40]/65" data-testid="requirements-support">Start with the requirement you have.</p>
+                <SectionMarker number="03" label="OUR SERVICES" />
+                <h2 className="mt-6 font-heading text-[clamp(2.2rem,5vw,4rem)] font-extrabold leading-[.95] tracking-[-0.04em] text-[#0f172a]" data-testid="requirements-headline">
+                  Requirements Arrive<br />in Different Forms.
+                </h2>
               </div>
-              <div className="relative grid gap-3 sm:grid-cols-2" data-testid="requirements-diagram">
-                <p className="relative z-10 col-span-full mb-1 font-mono text-[9px] tracking-[0.22em] text-[#132c40]/45" data-testid="requirements-instruction">SELECT HOW YOUR REQUIREMENT STARTS</p>
-                {requirementTypes.map((item, index) => {
-                  const isSelected = form.requirement_type === item.key;
-                  return (
-                    <button
-                      key={item.key}
-                      onClick={() => selectRequirementType(item.key)}
-                      className={`group relative z-10 flex min-h-[74px] w-full cursor-pointer items-center justify-between border px-5 text-left transition duration-300 hover:-translate-y-1 hover:shadow-sm ${
-                        isSelected
-                          ? "border-[#1bb8b0] bg-[#1bb8b0]/[0.07]"
-                          : "border-[#132c40]/12 bg-white hover:border-[#1bb8b0] hover:bg-[#132c40]/[0.025]"
-                      }`}
-                      data-testid={`requirement-form-${index + 1}`}
-                    >
-                      <span className={`font-mono text-[10px] tracking-[0.12em] transition-colors duration-300 ${isSelected ? "font-bold text-[#1bb8b0]" : "text-[#132c40]/70 group-hover:text-[#132c40]"}`} data-testid={`requirement-form-label-${index + 1}`}>{item.label}</span>
-                    </button>
-                  );
-                })}
-                <div className="relative z-10 col-span-full mx-auto mt-8 flex size-32 items-center justify-center rounded-full border border-[#1bb8b0] bg-[#132c40] text-center text-xs font-bold uppercase tracking-[0.15em] text-white shadow-[0_0_0_10px_#f7f8f6,0_0_0_11px_rgba(27,184,176,.28)]" data-testid="requirements-nautix-node">NAUTIX</div>
+              <p className="max-w-xs text-sm text-[#6b7280] sm:text-right" data-testid="requirements-support">Start with the requirement you have.</p>
+            </div>
+
+            <p className="mt-10 font-mono text-[9px] tracking-[0.22em] text-[#0f172a]/40" data-testid="requirements-instruction">SELECT HOW YOUR REQUIREMENT STARTS</p>
+
+            <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" data-testid="requirements-diagram">
+              {requirementTypes.map((item, index) => {
+                const isSelected = form.requirement_type === item.key;
+                const Icon = requirementIcons[item.key];
+                return (
+                  <button
+                    key={item.key}
+                    onClick={() => selectRequirementType(item.key)}
+                    className={`group flex flex-col gap-5 rounded-xl border-2 bg-white p-6 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${
+                      isSelected ? "border-[#dc2626] shadow-[#dc2626]/10" : "border-transparent hover:border-[#dc2626]/25"
+                    }`}
+                    data-testid={`requirement-form-${index + 1}`}
+                  >
+                    <div className={`flex size-12 items-center justify-center rounded-xl transition-colors duration-300 ${isSelected ? "bg-[#dc2626]" : "bg-[#fef2f2] group-hover:bg-[#dc2626]"}`}>
+                      <Icon className={`size-5 transition-colors duration-300 ${isSelected ? "text-white" : "text-[#dc2626] group-hover:text-white"}`} />
+                    </div>
+                    <div className="flex-1">
+                      <p className={`text-[11px] font-bold uppercase tracking-[0.12em] transition-colors duration-300 ${isSelected ? "text-[#dc2626]" : "text-[#0f172a] group-hover:text-[#dc2626]"}`} data-testid={`requirement-form-label-${index + 1}`}>{item.label}</p>
+                      <p className="mt-2 text-xs leading-5 text-[#6b7280] line-clamp-2">{item.requirementPlaceholder}</p>
+                    </div>
+                    <MoveRight className={`size-4 self-end transition-all duration-300 group-hover:translate-x-1 ${isSelected ? "text-[#dc2626]" : "text-[#d1d5db]"}`} />
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="mt-14 flex justify-center">
+              <div className="flex size-28 items-center justify-center rounded-full border-2 border-[#dc2626] bg-[#7f1d1d] text-center text-xs font-bold uppercase tracking-[0.15em] text-white shadow-[0_0_0_8px_#f8fafc,0_0_0_10px_rgba(220,38,38,.25)]" data-testid="requirements-nautix-node">NAUTIX</div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SOURCING PRACTICE ──────────────────────────────────────────────────── */}
+        <section id="practices" className="bg-white py-24 sm:py-32 lg:py-40" data-testid="sourcing-practice-section">
+          <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
+            <SectionMarker number="04" label="PRACTICE 01" />
+            <div className="mt-10 grid items-center gap-12 lg:grid-cols-[1.2fr_1fr] lg:gap-20">
+              <div className="relative min-h-[460px] overflow-hidden rounded-xl shadow-xl sm:min-h-[540px]" data-testid="sourcing-image-frame">
+                <img ref={sourcingReveal.ref} src={images.fabrication} alt="Shipyard fabrication zone with vessel hull and gantry crane" className={`absolute inset-0 size-full object-cover transition duration-700 hover:scale-105 reveal-image ${sourcingReveal.visible ? "is-visible" : ""}`} data-testid="sourcing-image" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#0f172a]/60 via-transparent to-transparent" />
+                <div className="absolute left-5 top-5 flex items-center gap-2 rounded-full bg-black/30 px-3 py-1.5 font-mono text-[9px] tracking-[0.22em] text-white backdrop-blur-sm" data-testid="sourcing-image-label">
+                  <span className="size-1.5 rounded-full bg-[#dc2626]" /> FABRICATION / INSPECTION
+                </div>
+                <div className="absolute bottom-5 right-5 font-mono text-[9px] tracking-[0.22em] text-white/60" data-testid="sourcing-image-index">01 — 02</div>
+              </div>
+              <div data-testid="sourcing-copy">
+                <h2 className="font-heading text-[clamp(2rem,4vw,3.5rem)] font-extrabold leading-[.95] tracking-[-0.04em] text-[#0f172a]" data-testid="sourcing-headline">Marine Sourcing &amp; Procurement</h2>
+                <p className="mt-6 text-[15px] leading-7 text-[#6b7280]" data-testid="sourcing-support">Marine procurement begins with understanding the requirement — its specifications, context and constraints.</p>
+                <p className="mt-5 text-base font-bold text-[#0f172a]" data-testid="sourcing-positioning">Nautix works from the requirement, not from a catalogue.</p>
+                <div className="mt-6 flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#dc2626]" data-testid="sourcing-discipline">
+                  <Minus className="size-4" /> Requirement-led procurement
+                </div>
+                <a href="#contact" className="mt-8 inline-flex items-center gap-2 rounded bg-[#dc2626] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#b91c1c]">
+                  Discuss a Requirement <MoveRight className="size-4" />
+                </a>
               </div>
             </div>
           </div>
         </section>
 
-        <section id="practices" className="bg-[#132c40] py-24 text-white sm:py-32 lg:py-40" data-testid="sourcing-practice-section">
-          <div className="mx-auto grid max-w-[1440px] gap-14 px-5 sm:px-8 lg:grid-cols-[1.15fr_.85fr] lg:items-center lg:gap-24 lg:px-12">
-            <div className="relative min-h-[460px] overflow-hidden sm:min-h-[580px]" data-testid="sourcing-image-frame">
-              <img ref={sourcingReveal.ref} src={images.fabrication} alt="Shipyard fabrication zone with vessel hull and gantry crane" className={`absolute inset-0 size-full object-cover transition duration-700 hover:scale-105 reveal-image ${sourcingReveal.visible ? "is-visible" : ""}`} data-testid="sourcing-image" />
-              <div className="absolute inset-0 bg-gradient-to-r from-[#132c40]/65 via-transparent to-transparent" />
-              <div className="absolute left-6 top-6 flex items-center gap-3 font-mono text-[9px] tracking-[0.22em] text-white/75" data-testid="sourcing-image-label"><span className="size-2 rounded-full bg-[#1bb8b0]" /> FABRICATION / INSPECTION</div>
-              <div className="absolute bottom-6 right-6 font-mono text-[9px] tracking-[0.22em] text-white/65" data-testid="sourcing-image-index">01 — 02</div>
-            </div>
-            <div data-testid="sourcing-copy">
-              <SectionMarker number="04" label="PRACTICE 01" />
-              <h2 className="mt-8 max-w-xl font-heading text-[clamp(2.7rem,6vw,5.2rem)] font-medium leading-[.97] tracking-[-0.07em]" data-testid="sourcing-headline">Marine Sourcing &amp; Procurement</h2>
-              <p className="mt-8 max-w-md text-sm leading-7 text-white/65" data-testid="sourcing-support">Marine procurement begins with understanding the requirement — its specifications, context and constraints.</p>
-              <p className="mt-6 max-w-sm text-base font-semibold leading-7 text-white" data-testid="sourcing-positioning">Nautix works from the requirement, not from a catalogue.</p>
-              <div className="mt-10 flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[#70e2db]" data-testid="sourcing-discipline"><Minus className="size-4" /> Requirement-led procurement</div>
-            </div>
-          </div>
-        </section>
-
-        <section className="relative flex min-h-[430px] items-center overflow-hidden bg-[#0a1b27] text-white" data-testid="visual-break-section">
-          <img src={images.engineRoom} alt="Technical marine equipment and vessel systems" className="absolute inset-0 size-full object-cover opacity-40" data-testid="visual-break-image" />
-          <div className="absolute inset-0 bg-[#0a1b27]/55" />
+        {/* ── VISUAL BREAK ───────────────────────────────────────────────────────── */}
+        <section className="relative flex min-h-[420px] items-center overflow-hidden bg-[#0f172a] text-white" data-testid="visual-break-section">
+          <img src={images.engineRoom} alt="Technical marine equipment and vessel systems" className="absolute inset-0 size-full object-cover opacity-20" data-testid="visual-break-image" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0f172a]/95 via-[#0f172a]/80 to-[#0f172a]/50" />
           <div className="relative mx-auto w-full max-w-[1440px] px-5 py-24 sm:px-8 lg:px-12">
             <div className="flex items-end justify-between gap-10" data-testid="visual-break-copy">
               <div>
-                <p className="font-mono text-[10px] tracking-[0.25em] text-[#70e2db]" data-testid="visual-break-kicker">05 / MARINE DETAIL</p>
-                <h2 className="mt-6 font-heading text-[clamp(3rem,9vw,8rem)] font-medium leading-[.86] tracking-[-0.08em]" data-testid="visual-break-headline">Specification<br /><span className="text-[#70e2db]">matters.</span></h2>
+                <p className="font-mono text-[10px] tracking-[0.28em] text-[#dc2626]" data-testid="visual-break-kicker">05 / MARINE DETAIL</p>
+                <h2 className="mt-6 font-heading text-[clamp(3rem,9vw,8rem)] font-extrabold leading-[.86] tracking-[-0.07em]" data-testid="visual-break-headline">
+                  Specification<br /><span className="text-[#dc2626]">matters.</span>
+                </h2>
               </div>
-              <div className="hidden max-w-[180px] pb-2 font-mono text-[9px] leading-5 tracking-[0.13em] text-white/55 sm:block" data-testid="visual-break-caption">MARINE / MARITIME / SHIPBUILDING</div>
+              <div className="hidden max-w-[180px] pb-2 font-mono text-[9px] leading-5 tracking-[0.13em] text-white/40 sm:block" data-testid="visual-break-caption">MARINE / MARITIME / SHIPBUILDING</div>
+            </div>
+          </div>
+          {/* Decorative anchor circle */}
+          <div className="absolute right-14 top-1/2 hidden -translate-y-1/2 lg:block">
+            <div className="flex size-44 items-center justify-center rounded-full border border-[#dc2626]/25 bg-[#dc2626]/5">
+              <div className="flex size-28 items-center justify-center rounded-full border border-[#dc2626]/40 bg-[#dc2626]/15">
+                <Anchor className="size-10 text-[#dc2626]" />
+              </div>
             </div>
           </div>
         </section>
 
-        <section className="bg-[#f7f8f6] py-24 sm:py-28 lg:py-36" data-testid="transition-section">
+        {/* ── TRANSITION ─────────────────────────────────────────────────────────── */}
+        <section className="bg-white py-24 sm:py-28 lg:py-36" data-testid="transition-section">
           <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
-            <div className="ml-auto max-w-3xl border-l border-[#1bb8b0] pl-6 sm:pl-10" data-testid="transition-copy">
+            <div className="ml-auto max-w-3xl border-l-4 border-[#dc2626] pl-8 sm:pl-12" data-testid="transition-copy">
               <SectionMarker number="06" label="A WIDER REQUIREMENT" />
-              <h2 className="mt-8 max-w-2xl font-heading text-[clamp(2.8rem,6vw,5.7rem)] font-medium leading-[.96] tracking-[-0.075em]" data-testid="transition-headline">Not every marine requirement ends with equipment.</h2>
-              <p className="mt-8 max-w-md text-sm leading-7 text-[#132c40]/65" data-testid="transition-support">Some requirements live in systems, workflows, information and software.</p>
+              <h2 className="mt-6 max-w-2xl font-heading text-[clamp(2rem,5vw,4rem)] font-extrabold leading-[.95] tracking-[-0.04em] text-[#0f172a]" data-testid="transition-headline">
+                Not every marine requirement ends with equipment.
+              </h2>
+              <p className="mt-6 max-w-md text-[15px] leading-7 text-[#6b7280]" data-testid="transition-support">Some requirements live in systems, workflows, information and software.</p>
             </div>
           </div>
         </section>
 
-        <section className="bg-[#e6ebeb] py-24 sm:py-32 lg:py-40" data-testid="technology-practice-section">
-          <div className="mx-auto grid max-w-[1440px] gap-16 px-5 sm:px-8 lg:grid-cols-[.82fr_1.18fr] lg:gap-24 lg:px-12">
+        {/* ── TECHNOLOGY PRACTICE ────────────────────────────────────────────────── */}
+        <section className="bg-[#f8fafc] py-24 sm:py-32 lg:py-40" data-testid="technology-practice-section">
+          <div className="mx-auto grid max-w-[1440px] gap-16 px-5 sm:px-8 lg:grid-cols-[1fr_1.2fr] lg:gap-24 lg:px-12">
             <div>
               <SectionMarker number="07" label="PRACTICE 02" />
-              <h2 className="mt-8 max-w-xl font-heading text-[clamp(2.7rem,6vw,5.2rem)] font-medium leading-[.97] tracking-[-0.07em]" data-testid="technology-headline">Marine Technology &amp; Engineering</h2>
-              <p className="mt-8 max-w-md text-sm leading-7 text-[#132c40]/65" data-testid="technology-support">Purpose-built technology for marine and shipbuilding requirements.</p>
+              <h2 className="mt-6 max-w-xl font-heading text-[clamp(2rem,4vw,3.5rem)] font-extrabold leading-[.95] tracking-[-0.04em] text-[#0f172a]" data-testid="technology-headline">Marine Technology &amp; Engineering</h2>
+              <p className="mt-6 max-w-md text-[15px] leading-7 text-[#6b7280]" data-testid="technology-support">Purpose-built technology for marine and shipbuilding requirements.</p>
+              <a href="#contact" className="mt-8 inline-flex items-center gap-2 rounded bg-[#0f172a] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#1e293b]">
+                Discuss a Requirement <ArrowUpRight className="size-4" />
+              </a>
             </div>
-            <div className="grid border-t border-[#132c40]/20" data-testid="technology-disciplines">
-              {["Custom Software", "Systems Integration", "Operational Applications"].map((item, index) => (
-                <div className="flex items-center justify-between border-b border-[#132c40]/20 py-6" key={item} data-testid={`technology-discipline-${index + 1}`}>
-                  <span className="text-lg font-semibold tracking-[-0.03em]" data-testid={`technology-discipline-label-${index + 1}`}>{item}</span>
-                  <span className="font-mono text-[10px] text-[#132c40]/45" data-testid={`technology-discipline-number-${index + 1}`}>0{index + 1}</span>
-                </div>
-              ))}
-              <div className="mt-12 flex items-center gap-5" data-testid="technology-diagram">
-                <div className="flex size-16 items-center justify-center rounded-full border border-[#1bb8b0] bg-[#132c40] text-[10px] font-bold tracking-[0.1em] text-white" data-testid="technology-nautix-node">NX</div>
-                <div className="h-px flex-1 bg-[#1bb8b0]/60" data-testid="technology-connector" />
-                <span className="font-mono text-[10px] tracking-[0.16em] text-[#132c40]/60" data-testid="technology-domain-label">MARINE DOMAIN</span>
+            <div className="rounded-xl border border-[#e5e7eb] bg-white p-8 shadow-sm" data-testid="technology-disciplines">
+              <div className="grid">
+                {["Custom Software", "Systems Integration", "Operational Applications"].map((item, index) => (
+                  <div className="flex items-center justify-between border-b border-[#f1f5f9] py-5 last:border-b-0" key={item} data-testid={`technology-discipline-${index + 1}`}>
+                    <span className="text-base font-semibold text-[#0f172a]" data-testid={`technology-discipline-label-${index + 1}`}>{item}</span>
+                    <span className="font-mono text-[10px] text-[#9ca3af]" data-testid={`technology-discipline-number-${index + 1}`}>0{index + 1}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-8 flex items-center gap-4" data-testid="technology-diagram">
+                <div className="flex size-14 items-center justify-center rounded-full border-2 border-[#dc2626] bg-[#7f1d1d] text-[10px] font-bold tracking-[0.1em] text-white" data-testid="technology-nautix-node">NX</div>
+                <div className="h-0.5 flex-1 bg-[#dc2626]/50" data-testid="technology-connector" />
+                <span className="rounded-full bg-[#fef2f2] px-3 py-1.5 font-mono text-[9px] font-bold tracking-[0.16em] text-[#dc2626]" data-testid="technology-domain-label">MARINE DOMAIN</span>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="bg-[#f7f8f6] py-24 sm:py-32 lg:py-40" data-testid="summary-section">
+        {/* ── SUMMARY ────────────────────────────────────────────────────────────── */}
+        <section className="bg-white py-24 sm:py-32 lg:py-40" data-testid="summary-section">
           <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
             <SectionMarker number="08" label="TWO PRACTICES / ONE DOMAIN" />
-            <h2 className="mt-8 max-w-3xl font-heading text-[clamp(2.9rem,7vw,6.4rem)] font-medium leading-[.92] tracking-[-0.08em]" data-testid="summary-headline">One domain.<br /><span className="text-[#1bb8b0]">Different requirements.</span></h2>
-            <div ref={connectorReveal.ref} className="relative mt-16 grid gap-3 md:grid-cols-2" data-testid="summary-diagram">
-              <div className={`absolute left-1/2 top-[calc(100%_-_76px)] hidden h-20 w-px -translate-x-1/2 bg-[#1bb8b0] md:block reveal-connector ${connectorReveal.visible ? "is-visible" : ""}`} data-testid="summary-connector" />
-              <div className="border border-[#132c40]/15 bg-white p-7 sm:p-10" data-testid="summary-sourcing-card"><p className="font-mono text-[10px] tracking-[0.2em] text-[#1bb8b0]" data-testid="summary-sourcing-label">PRACTICE 01</p><h3 className="mt-16 max-w-xs font-heading text-2xl font-semibold leading-tight tracking-[-0.05em] sm:text-3xl" data-testid="summary-sourcing-title">Marine Sourcing<br />&amp; Procurement</h3></div>
-              <div className="border border-[#132c40]/15 bg-[#132c40] p-7 text-white sm:p-10" data-testid="summary-technology-card"><p className="font-mono text-[10px] tracking-[0.2em] text-[#70e2db]" data-testid="summary-technology-label">PRACTICE 02</p><h3 className="mt-16 max-w-xs font-heading text-2xl font-semibold leading-tight tracking-[-0.05em] sm:text-3xl" data-testid="summary-technology-title">Marine Technology<br />&amp; Engineering</h3></div>
-              <div className="relative z-10 col-span-full mx-auto mt-10 bg-[#1bb8b0] px-7 py-4 font-mono text-[10px] font-bold tracking-[0.2em] text-[#0c202e]" data-testid="summary-domain-node">MARINE / MARITIME / SHIPBUILDING</div>
+            <h2 className="mt-6 max-w-3xl font-heading text-[clamp(2.4rem,6vw,5rem)] font-extrabold leading-[.92] tracking-[-0.04em] text-[#0f172a]" data-testid="summary-headline">
+              One Domain.<br /><span className="text-[#dc2626]">Different Requirements.</span>
+            </h2>
+            <div ref={connectorReveal.ref} className="relative mt-14 grid gap-5 md:grid-cols-2" data-testid="summary-diagram">
+              <div className={`absolute left-1/2 top-[calc(100%-76px)] hidden h-20 w-0.5 -translate-x-1/2 bg-[#dc2626] md:block reveal-connector ${connectorReveal.visible ? "is-visible" : ""}`} data-testid="summary-connector" />
+              <div className="rounded-xl border border-[#e5e7eb] bg-white p-8 shadow-sm sm:p-10" data-testid="summary-sourcing-card">
+                <p className="font-mono text-[10px] font-bold tracking-[0.2em] text-[#dc2626]" data-testid="summary-sourcing-label">PRACTICE 01</p>
+                <h3 className="mt-5 font-heading text-2xl font-extrabold leading-tight tracking-[-0.04em] text-[#0f172a] sm:text-3xl" data-testid="summary-sourcing-title">Marine Sourcing<br />&amp; Procurement</h3>
+                <p className="mt-4 text-sm leading-6 text-[#6b7280]">Requirement-led sourcing and procurement for the marine and maritime sector.</p>
+              </div>
+              <div className="rounded-xl bg-[#7f1d1d] p-8 text-white shadow-sm sm:p-10" data-testid="summary-technology-card">
+                <p className="font-mono text-[10px] font-bold tracking-[0.2em] text-[#fca5a5]" data-testid="summary-technology-label">PRACTICE 02</p>
+                <h3 className="mt-5 font-heading text-2xl font-extrabold leading-tight tracking-[-0.04em] sm:text-3xl" data-testid="summary-technology-title">Marine Technology<br />&amp; Engineering</h3>
+                <p className="mt-4 text-sm leading-6 text-white/65">Purpose-built technology for marine and shipbuilding requirements.</p>
+              </div>
+              <div className="relative z-10 col-span-full mx-auto mt-6 rounded bg-[#dc2626] px-8 py-4 font-mono text-[11px] font-bold tracking-[0.2em] text-white shadow-lg" data-testid="summary-domain-node">MARINE / MARITIME / SHIPBUILDING</div>
             </div>
           </div>
         </section>
 
-        <section id="contact" className="bg-[#132c40] py-24 text-white sm:py-32 lg:py-40" data-testid="contact-section">
+        {/* ── CONTACT ────────────────────────────────────────────────────────────── */}
+        <section id="contact" className="bg-[#7f1d1d] py-24 text-white sm:py-32 lg:py-40" data-testid="contact-section">
           <div className="mx-auto grid max-w-[1440px] gap-16 px-5 sm:px-8 lg:grid-cols-[.9fr_1.1fr] lg:gap-24 lg:px-12">
             <div data-testid="contact-intro">
-              <SectionMarker number="09" label="START A CONVERSATION" />
-              <h2 className="mt-8 max-w-xl font-heading text-[clamp(3rem,7vw,6.5rem)] font-medium leading-[.9] tracking-[-0.08em]" data-testid="contact-headline">Have a marine requirement?</h2>
+              <SectionMarker number="09" label="START A CONVERSATION" light />
+              <h2 className="mt-8 max-w-xl font-heading text-[clamp(3rem,7vw,6.5rem)] font-extrabold leading-[.9] tracking-[-0.06em]" data-testid="contact-headline">Have a marine requirement?</h2>
               <p className="mt-8 text-base font-semibold text-white/75" data-testid="contact-support">Start with what you have.</p>
               <p className="mt-16 hidden max-w-xs text-sm leading-7 text-white/45 lg:block" data-testid="contact-note">A specification, drawing, datasheet, BOM or a short description is enough to start the conversation.</p>
             </div>
             <form className="border-t border-white/20 pt-7" onSubmit={submitForm} data-testid="contact-form">
               {selectedType && (
-                <div className="mb-7 flex items-center justify-between border border-[#1bb8b0]/35 bg-[#1bb8b0]/[0.08] px-4 py-3" data-testid="contact-requirement-type-badge">
+                <div className="mb-7 flex items-center justify-between rounded-lg border border-[#dc2626]/35 bg-[#dc2626]/[0.08] px-4 py-3" data-testid="contact-requirement-type-badge">
                   <div className="flex items-center gap-3">
-                    <span className="font-mono text-[9px] tracking-[0.2em] text-[#70e2db]/70">REQUIREMENT TYPE</span>
+                    <span className="font-mono text-[9px] tracking-[0.2em] text-[#fca5a5]/70">REQUIREMENT TYPE</span>
                     <span className="font-mono text-[10px] font-bold tracking-[0.14em] text-white">{selectedType.label}</span>
                   </div>
                   <button type="button" onClick={() => setForm((c) => ({ ...c, requirement_type: null }))} className="text-white/35 transition-colors hover:text-white" aria-label="Clear requirement type" data-testid="contact-requirement-type-clear">
@@ -390,15 +524,23 @@ export default function Home() {
                 </div>
               )}
               <div className="grid gap-6 sm:grid-cols-2">
-                <label className="form-label" data-testid="contact-name-field"><span data-testid="contact-name-label">Name</span><Input required value={form.name} onChange={(event) => updateField("name", event.target.value)} placeholder="Your name" className="form-input" data-testid="contact-name-input" /></label>
-                <label className="form-label" data-testid="contact-company-field"><span data-testid="contact-company-label">Company</span><Input required value={form.company} onChange={(event) => updateField("company", event.target.value)} placeholder="Company name" className="form-input" data-testid="contact-company-input" /></label>
-                <label className="form-label sm:col-span-2" data-testid="contact-email-field"><span data-testid="contact-email-label">Email</span><Input required type="email" value={form.email} onChange={(event) => updateField("email", event.target.value)} placeholder="you@company.com" className="form-input" data-testid="contact-email-input" /></label>
-                <label className="form-label sm:col-span-2" data-testid="contact-requirement-field"><span data-testid="contact-requirement-label">Requirement</span><Textarea required value={form.requirement} onChange={(event) => updateField("requirement", event.target.value)} placeholder={selectedType?.requirementPlaceholder ?? "Tell us what you are working with"} className="form-input min-h-32 resize-y" data-testid="contact-requirement-input" /></label>
-                <label className="group flex cursor-pointer flex-wrap items-center gap-3 text-xs text-white/60 sm:col-span-2" data-testid="contact-attachment-field"><FileText className="size-4 text-[#70e2db]" /><span className="underline decoration-white/25 underline-offset-4" data-testid="contact-attachment-label">{selectedType?.attachmentLabel ?? "Attach a requirement document"}</span><input type="file" accept=".pdf,.png,.jpg,.jpeg,.csv,.xlsx,.docx" className="sr-only" onChange={(event) => updateAttachment(event.target.files?.[0] ?? null)} data-testid="contact-attachment-input" /><span className="truncate text-white/40" data-testid="contact-attachment-name">{form.attachment?.name || "Optional"}</span><span className="w-full pl-7 text-[10px] text-white/35" data-testid="contact-attachment-guidance">PDF, PNG, JPG, CSV, XLSX, DOCX · max 10 MB</span></label>
+                <label className="form-label" data-testid="contact-name-field"><span data-testid="contact-name-label">Name</span><Input required value={form.name} onChange={(e) => updateField("name", e.target.value)} placeholder="Your name" className="form-input" data-testid="contact-name-input" /></label>
+                <label className="form-label" data-testid="contact-company-field"><span data-testid="contact-company-label">Company</span><Input required value={form.company} onChange={(e) => updateField("company", e.target.value)} placeholder="Company name" className="form-input" data-testid="contact-company-input" /></label>
+                <label className="form-label sm:col-span-2" data-testid="contact-email-field"><span data-testid="contact-email-label">Email</span><Input required type="email" value={form.email} onChange={(e) => updateField("email", e.target.value)} placeholder="you@company.com" className="form-input" data-testid="contact-email-input" /></label>
+                <label className="form-label sm:col-span-2" data-testid="contact-requirement-field"><span data-testid="contact-requirement-label">Requirement</span><Textarea required value={form.requirement} onChange={(e) => updateField("requirement", e.target.value)} placeholder={selectedType?.requirementPlaceholder ?? "Tell us what you are working with"} className="form-input min-h-32 resize-y" data-testid="contact-requirement-input" /></label>
+                <label className="group flex cursor-pointer flex-wrap items-center gap-3 text-xs text-white/60 sm:col-span-2" data-testid="contact-attachment-field">
+                  <FileText className="size-4 text-[#fca5a5]" />
+                  <span className="underline decoration-white/25 underline-offset-4" data-testid="contact-attachment-label">{selectedType?.attachmentLabel ?? "Attach a requirement document"}</span>
+                  <input type="file" accept=".pdf,.png,.jpg,.jpeg,.csv,.xlsx,.docx" className="sr-only" onChange={(e) => updateAttachment(e.target.files?.[0] ?? null)} data-testid="contact-attachment-input" />
+                  <span className="truncate text-white/40" data-testid="contact-attachment-name">{form.attachment?.name || "Optional"}</span>
+                  <span className="w-full pl-7 text-[10px] text-white/35" data-testid="contact-attachment-guidance">PDF, PNG, JPG, CSV, XLSX, DOCX · max 10 MB</span>
+                </label>
               </div>
               <div className="mt-8 flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:justify-between" data-testid="contact-form-actions">
-                <Button type="submit" disabled={mutation.isPending} className="rounded-full bg-[#1bb8b0] px-6 text-[#0c202e] hover:bg-[#70e2db]" data-testid="contact-submit-button">{mutation.isPending ? "Sending…" : "Discuss a Requirement"}<ArrowRightIcon /></Button>
-                {submitted && <p className="flex items-center gap-2 text-xs text-[#70e2db]" role="status" data-testid="contact-success-message"><Check className="size-4" /> Requirement received. Thank you.</p>}
+                <Button type="submit" disabled={mutation.isPending} className="rounded bg-[#dc2626] px-6 py-3 text-sm font-bold text-white hover:bg-[#b91c1c]" data-testid="contact-submit-button">
+                  {mutation.isPending ? "Sending…" : "Discuss a Requirement"}<ArrowUpRight className="ml-2 size-4" data-testid="contact-submit-icon" />
+                </Button>
+                {submitted && <p className="flex items-center gap-2 text-xs text-[#fca5a5]" role="status" data-testid="contact-success-message"><Check className="size-4" /> Requirement received. Thank you.</p>}
                 {mutation.isError && <p className="text-xs text-[#ffb4a9]" role="alert" data-testid="contact-error-message">Something went wrong. Please try again.</p>}
               </div>
             </form>
@@ -406,16 +548,36 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="bg-[#091a25] py-10 text-white" data-testid="site-footer">
-        <div className="mx-auto flex max-w-[1440px] flex-col gap-8 px-5 sm:px-8 md:flex-row md:items-end md:justify-between lg:px-12">
-          <div><a href="#top" className="font-heading text-2xl font-extrabold tracking-[-0.08em]" data-testid="footer-logo">NAUTIX<span className="text-[#1bb8b0]">.</span></a><p className="mt-3 font-mono text-[9px] tracking-[0.2em] text-white/45" data-testid="footer-domain">MARINE / MARITIME / SHIPBUILDING</p></div>
-          <div className="flex flex-col gap-3 text-xs text-white/55 md:items-end"><a href="#contact" className="hover:text-[#70e2db]" data-testid="footer-contact-link">Contact Nautix</a><a href="/privacy" className="hover:text-[#70e2db]" data-testid="footer-privacy">Privacy</a><span data-testid="footer-copyright">© 2025 Nautix</span></div>
+      {/* ── FOOTER ─────────────────────────────────────────────────────────────── */}
+      <footer className="bg-[#0f172a] py-14 text-white" data-testid="site-footer">
+        <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
+          <div className="grid gap-10 md:grid-cols-[2fr_1fr_1fr]">
+            <div>
+              <a href="#top" className="font-heading text-2xl font-extrabold tracking-[-0.05em]" data-testid="footer-logo">NAUTIX<span className="text-[#dc2626]">.</span></a>
+              <p className="mt-2 font-mono text-[9px] tracking-[0.2em] text-white/35" data-testid="footer-domain">MARINE / MARITIME / SHIPBUILDING</p>
+              <p className="mt-5 max-w-xs text-sm leading-6 text-white/50">Requirement-led sourcing, procurement, and technology for the marine and maritime sector.</p>
+            </div>
+            <div>
+              <p className="mb-4 text-[11px] font-bold uppercase tracking-[0.15em] text-white/35">Navigation</p>
+              <div className="flex flex-col gap-3 text-sm text-white/65">
+                <a href="#practices" className="transition hover:text-[#dc2626]">Practices</a>
+                <a href="#about" className="transition hover:text-[#dc2626]">About</a>
+                <a href="#contact" className="transition hover:text-[#dc2626]" data-testid="footer-contact-link">Contact Nautix</a>
+              </div>
+            </div>
+            <div>
+              <p className="mb-4 text-[11px] font-bold uppercase tracking-[0.15em] text-white/35">Legal</p>
+              <div className="flex flex-col gap-3 text-sm text-white/65">
+                <a href="/privacy" className="transition hover:text-[#dc2626]" data-testid="footer-privacy">Privacy Policy</a>
+                <span data-testid="footer-copyright">© 2025 Nautix</span>
+              </div>
+            </div>
+          </div>
+          <div className="mt-12 border-t border-white/10 pt-8 text-center">
+            <p className="text-xs text-white/25">Marine · Maritime · Shipbuilding</p>
+          </div>
         </div>
       </footer>
     </div>
   );
-}
-
-function ArrowRightIcon() {
-  return <ArrowUpRight className="ml-2 size-4" data-testid="contact-submit-icon" />;
 }
