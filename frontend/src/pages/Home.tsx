@@ -202,7 +202,7 @@ export default function Home() {
         <div className="mx-auto flex h-[72px] max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-12">
           <a href="#top" className="flex items-center gap-2.5" data-testid="header-logo">
             <img src="/images/nautix-logo.png" alt="Nautix" className="h-9 w-auto object-contain" />
-            <span className="font-heading text-xl font-extrabold tracking-[-0.04em] text-[#0f172a]">NAUTIX</span>
+            <span className="font-heading text-xl font-extrabold tracking-[-0.04em] text-[#0f172a]">NAUTI<span className="text-[#dc2626]">X</span></span>
           </a>
           <nav className="hidden items-center gap-8 md:flex" aria-label="Primary navigation" data-testid="desktop-navigation">
             <a href="#practices" className="relative text-[13px] font-semibold text-[#374151] transition-colors after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:bg-[#dc2626] after:transition-all hover:text-[#dc2626] hover:after:w-full" data-testid="header-practices-link">Practices</a>
@@ -378,7 +378,7 @@ export default function Home() {
             </div>
 
             <div className="mt-14 flex justify-center">
-              <div className="flex size-28 items-center justify-center rounded-full border-2 border-[#dc2626] bg-[#7f1d1d] text-center text-xs font-bold uppercase tracking-[0.15em] text-white shadow-[0_0_0_8px_#f8fafc,0_0_0_10px_rgba(220,38,38,.25)]" data-testid="requirements-nautix-node">NAUTIX</div>
+              <div className="flex size-28 items-center justify-center rounded-full border-2 border-[#dc2626] bg-[#7f1d1d] text-center text-xs font-bold uppercase tracking-[0.15em] text-white shadow-[0_0_0_8px_#f8fafc,0_0_0_10px_rgba(220,38,38,.25)]" data-testid="requirements-nautix-node">NAUTI<span className="text-[#fca5a5]">X</span></div>
             </div>
           </div>
         </section>
@@ -553,7 +553,7 @@ export default function Home() {
         <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
           <div className="grid gap-10 md:grid-cols-[2fr_1fr_1fr]">
             <div>
-              <a href="#top" className="font-heading text-2xl font-extrabold tracking-[-0.05em]" data-testid="footer-logo">NAUTIX<span className="text-[#dc2626]">.</span></a>
+              <a href="#top" className="font-heading text-2xl font-extrabold tracking-[-0.05em]" data-testid="footer-logo">NAUTI<span className="text-[#dc2626]">X.</span></a>
               <p className="mt-2 font-mono text-[9px] tracking-[0.2em] text-white/35" data-testid="footer-domain">MARINE / MARITIME / SHIPBUILDING</p>
               <p className="mt-5 max-w-xs text-sm leading-6 text-white/50">Requirement-led sourcing, procurement, and technology for the marine and maritime sector.</p>
             </div>
