@@ -577,7 +577,7 @@ export default function Home() {
               <div className="flex flex-col gap-4 text-sm text-white/65">
                 <div className="flex items-start gap-3">
                   <MapPin className="mt-0.5 size-4 shrink-0 text-[#dc2626]" />
-                  <span className="leading-5">#222, Commander's Galaxy,<br />Agrahara Layout Main Road,<br />M S Nagar, Bengaluru – 560064,<br />Karnataka</span>
+                  <span className="leading-5">Commander's Galaxy,<br />M S Nagar, Bengaluru – 560064,<br />Karnataka, India.</span>
                 </div>
                 <a href="tel:9886635710" className="flex items-center gap-3 transition hover:text-[#dc2626]">
                   <Phone className="size-4 shrink-0 text-[#dc2626]" />
