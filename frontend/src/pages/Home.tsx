@@ -583,14 +583,14 @@ export default function Home() {
                   <Phone className="size-4 shrink-0 text-[#dc2626]" />
                   +91 9886 635710
                 </a>
-                <div className="flex items-center gap-3">
-                  <Globe className="size-4 shrink-0 text-[#dc2626]" />
-                  <span>GSTN: 29ABAFN3894J1ZQ</span>
-                </div>
                 <a href="mailto:contact@nautix.in" className="flex items-center gap-3 transition hover:text-[#dc2626]">
                   <Mail className="size-4 shrink-0 text-[#dc2626]" />
                   contact@nautix.in
                 </a>
+                <div className="flex items-center gap-3">
+                  <Globe className="size-4 shrink-0 text-[#dc2626]" />
+                  <span>GSTN: 29ABAFN3894J1ZQ</span>
+                </div>
               </div>
             </div>
           </div>
