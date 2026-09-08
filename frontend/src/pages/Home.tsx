@@ -326,7 +326,7 @@ export default function Home() {
             <div className="mt-12 grid gap-5 lg:grid-cols-2">
 
               {/* Card: Marine Environment */}
-              <div className="flex flex-col rounded-2xl border border-[#e5e7eb] bg-white p-8 shadow-sm sm:p-10" data-testid="environment-section">
+              <div className="flex flex-col rounded-2xl border border-[#e5e7eb] bg-white p-8 shadow-md sm:p-10" data-testid="environment-section">
                 <p className="font-mono text-[9px] font-bold tracking-[0.22em] text-[#dc2626]">THE MARINE ENVIRONMENT</p>
                 <h3 className="mt-5 font-heading text-2xl font-extrabold leading-tight tracking-[-0.04em] text-[#0f172a] sm:text-3xl" data-testid="environment-headline">
                   Built Around the<br /><span className="text-[#dc2626]">Marine Environment.</span>
@@ -371,7 +371,7 @@ export default function Home() {
             </div>
 
             {/* Row 2 — Requirements card */}
-            <div className="mt-5 rounded-2xl border border-[#e5e7eb] bg-white p-8 shadow-sm sm:p-10" data-testid="requirements-section">
+            <div className="mt-5 rounded-2xl border border-[#e5e7eb] bg-white p-8 shadow-md sm:p-10" data-testid="requirements-section">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                   <p className="font-mono text-[9px] font-bold tracking-[0.22em] text-[#dc2626]">OUR SERVICES</p>
@@ -390,8 +390,8 @@ export default function Home() {
                     <button
                       key={item.key}
                       onClick={() => selectRequirementType(item.key)}
-                      className={`group flex flex-col gap-4 rounded-xl border-2 bg-[#f8fafc] p-5 text-left transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${
-                        isSelected ? "border-[#dc2626] bg-white shadow-[#dc2626]/10" : "border-transparent hover:border-[#dc2626]/25 hover:bg-white"
+                      className={`group flex flex-col gap-4 rounded-xl border-2 bg-white p-5 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${
+                        isSelected ? "border-[#dc2626] shadow-[#dc2626]/10" : "border-transparent hover:border-[#dc2626]/25"
                       }`}
                       data-testid={`requirement-form-${index + 1}`}
                     >
