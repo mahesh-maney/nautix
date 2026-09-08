@@ -579,9 +579,9 @@ export default function Home() {
                   <MapPin className="mt-0.5 size-4 shrink-0 text-[#dc2626]" />
                   <span className="leading-5">Commander's Galaxy,<br />M S Nagar, Bengaluru – 560064,<br />Karnataka, India.</span>
                 </div>
-                <a href="tel:9886635710" className="flex items-center gap-3 transition hover:text-[#dc2626]">
+                <a href="tel:+919886635710" className="flex items-center gap-3 transition hover:text-[#dc2626]">
                   <Phone className="size-4 shrink-0 text-[#dc2626]" />
-                  9886 635710
+                  +91 9886 635710
                 </a>
                 <a href="https://www.nautix.in" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 transition hover:text-[#dc2626]">
                   <Globe className="size-4 shrink-0 text-[#dc2626]" />
