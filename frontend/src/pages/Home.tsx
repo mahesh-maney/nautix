@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { ArrowUpRight, Check, FileText, Menu, Minus, MoveRight, X, Shield, Zap, Anchor, Headphones, Package, Settings, Tag, Ruler, Briefcase } from "lucide-react";
+import { ArrowUpRight, Check, FileText, Menu, MoveRight, X, Shield, Zap, Anchor, Headphones, Package, Settings, Tag, Ruler, Briefcase } from "lucide-react";
 import { apiPostForm } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -152,7 +152,6 @@ export default function Home() {
   const [form, setForm] = useState(initialForm);
   const [submitted, setSubmitted] = useState(false);
   const selectedType = requirementTypes.find((t) => t.key === form.requirement_type) ?? null;
-  const environmentReveal = useReveal<HTMLImageElement>();
   const sourcingReveal = useReveal<HTMLImageElement>();
   const connectorReveal = useReveal<HTMLDivElement>();
 
@@ -309,130 +308,125 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── ABOUT / ENVIRONMENT ────────────────────────────────────────────────── */}
-        <section id="about" className="bg-white py-24 sm:py-32 lg:py-40" data-testid="environment-section">
-          <div className="mx-auto grid max-w-[1440px] items-center gap-14 px-5 sm:px-8 lg:grid-cols-[1fr_1.1fr] lg:gap-24 lg:px-12">
-            <div data-testid="environment-copy">
-              <SectionMarker number="02" label="THE MARINE ENVIRONMENT" />
-              <h2 className="mt-6 max-w-xl font-heading text-[clamp(2.2rem,5vw,4rem)] font-extrabold leading-[.95] tracking-[-0.04em] text-[#0f172a]" data-testid="environment-headline">
-                Built Around the<br /><span className="text-[#dc2626]">Marine Environment.</span>
+        {/* ── ENVIRONMENT · SERVICES · SOURCING · SPECIFICATION ──────────────────── */}
+        <section id="about" className="bg-[#f8fafc] py-24 sm:py-32 lg:py-40">
+          <span id="practices" />
+          <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
+
+            {/* Header */}
+            <SectionMarker number="02" label="THE MARINE ENVIRONMENT" />
+            <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <h2 className="max-w-2xl font-heading text-[clamp(2.2rem,5vw,4rem)] font-extrabold leading-[.95] tracking-[-0.04em] text-[#0f172a]">
+                Marine Requirements,<br /><span className="text-[#dc2626]">Solved with Precision.</span>
               </h2>
-              <p className="mt-7 max-w-md text-[15px] leading-7 text-[#6b7280]" data-testid="environment-audience">
-                Shipyards. Vessel owners and operators. Ports. Offshore businesses. Marine contractors. Ship-management companies.
-              </p>
-              <p className="mt-5 max-w-sm text-base font-bold text-[#0f172a]" data-testid="environment-support">
-                Different operations. Different requirements. One demanding environment.
-              </p>
-              <a href="#contact" className="mt-8 inline-flex items-center gap-2 rounded bg-[#dc2626] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#b91c1c]">
-                Get In Touch <ArrowUpRight className="size-4" />
-              </a>
+              <p className="max-w-xs text-sm text-[#6b7280] sm:text-right">Built around the requirements that define marine and maritime operations.</p>
             </div>
-            <div className="relative min-h-[420px] overflow-hidden rounded-xl shadow-xl sm:min-h-[520px]" data-testid="environment-image-frame">
-              <img ref={environmentReveal.ref} src={images.engineRoom} alt="Engineers working around machinery in a vessel engine room" className={`absolute inset-0 size-full object-cover transition duration-700 hover:scale-105 reveal-image ${environmentReveal.visible ? "is-visible" : ""}`} data-testid="environment-image" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a]/60 via-transparent to-transparent" />
-              <div className="absolute left-0 top-0 h-full w-1.5 bg-[#dc2626]" data-testid="environment-corner-detail" />
-              <span className="absolute bottom-6 left-7 font-mono text-[9px] tracking-[0.25em] text-white/80" data-testid="environment-image-caption">VESSEL SYSTEMS / ENGINE ROOM</span>
-            </div>
-          </div>
-        </section>
 
-        {/* ── REQUIREMENTS / SERVICES ────────────────────────────────────────────── */}
-        <section className="bg-[#f8fafc] py-24 sm:py-32 lg:py-40" data-testid="requirements-section">
-          <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <SectionMarker number="03" label="OUR SERVICES" />
-                <h2 className="mt-6 font-heading text-[clamp(2.2rem,5vw,4rem)] font-extrabold leading-[.95] tracking-[-0.04em] text-[#0f172a]" data-testid="requirements-headline">
-                  Requirements Arrive<br />in Different Forms.
-                </h2>
+            {/* Row 1 — two equal cards */}
+            <div className="mt-12 grid gap-5 lg:grid-cols-2">
+
+              {/* Card: Marine Environment */}
+              <div className="flex flex-col rounded-2xl border border-[#e5e7eb] bg-white p-8 shadow-sm sm:p-10" data-testid="environment-section">
+                <p className="font-mono text-[9px] font-bold tracking-[0.22em] text-[#dc2626]">THE MARINE ENVIRONMENT</p>
+                <h3 className="mt-5 font-heading text-2xl font-extrabold leading-tight tracking-[-0.04em] text-[#0f172a] sm:text-3xl" data-testid="environment-headline">
+                  Built Around the<br /><span className="text-[#dc2626]">Marine Environment.</span>
+                </h3>
+                <p className="mt-5 text-[15px] leading-7 text-[#6b7280]" data-testid="environment-audience">
+                  Shipyards. Vessel owners and operators. Ports. Offshore businesses. Marine contractors. Ship-management companies.
+                </p>
+                <p className="mt-4 text-base font-bold text-[#0f172a]" data-testid="environment-support">
+                  Different operations. Different requirements. One demanding environment.
+                </p>
+                <a href="#contact" className="mt-auto pt-8 inline-flex w-fit items-center gap-2 rounded bg-[#dc2626] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#b91c1c]">
+                  Get In Touch <ArrowUpRight className="size-4" />
+                </a>
               </div>
-              <p className="max-w-xs text-sm text-[#6b7280] sm:text-right" data-testid="requirements-support">Start with the requirement you have.</p>
-            </div>
 
-            <p className="mt-10 font-mono text-[9px] tracking-[0.22em] text-[#0f172a]/40" data-testid="requirements-instruction">SELECT HOW YOUR REQUIREMENT STARTS</p>
-
-            <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" data-testid="requirements-diagram">
-              {requirementTypes.map((item, index) => {
-                const isSelected = form.requirement_type === item.key;
-                const Icon = requirementIcons[item.key];
-                return (
-                  <button
-                    key={item.key}
-                    onClick={() => selectRequirementType(item.key)}
-                    className={`group flex flex-col gap-5 rounded-xl border-2 bg-white p-6 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${
-                      isSelected ? "border-[#dc2626] shadow-[#dc2626]/10" : "border-transparent hover:border-[#dc2626]/25"
-                    }`}
-                    data-testid={`requirement-form-${index + 1}`}
-                  >
-                    <div className={`flex size-12 items-center justify-center rounded-xl transition-colors duration-300 ${isSelected ? "bg-[#dc2626]" : "bg-[#fef2f2] group-hover:bg-[#dc2626]"}`}>
-                      <Icon className={`size-5 transition-colors duration-300 ${isSelected ? "text-white" : "text-[#dc2626] group-hover:text-white"}`} />
-                    </div>
-                    <div className="flex-1">
-                      <p className={`text-[11px] font-bold uppercase tracking-[0.12em] transition-colors duration-300 ${isSelected ? "text-[#dc2626]" : "text-[#0f172a] group-hover:text-[#dc2626]"}`} data-testid={`requirement-form-label-${index + 1}`}>{item.label}</p>
-                      <p className="mt-2 text-xs leading-5 text-[#6b7280] line-clamp-2">{item.requirementPlaceholder}</p>
-                    </div>
-                    <MoveRight className={`size-4 self-end transition-all duration-300 group-hover:translate-x-1 ${isSelected ? "text-[#dc2626]" : "text-[#d1d5db]"}`} />
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="mt-14 flex justify-center">
-              <div className="flex size-28 items-center justify-center rounded-full border-2 border-[#dc2626] bg-[#7f1d1d] text-center text-xs font-bold uppercase tracking-[0.15em] text-white shadow-[0_0_0_8px_#f8fafc,0_0_0_10px_rgba(220,38,38,.25)]" data-testid="requirements-nautix-node">NAUTI<span className="text-[#fca5a5]">X</span></div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── SOURCING PRACTICE ──────────────────────────────────────────────────── */}
-        <section id="practices" className="bg-white py-24 sm:py-32 lg:py-40" data-testid="sourcing-practice-section">
-          <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12">
-            <SectionMarker number="04" label="PRACTICE 01" />
-            <div className="mt-10 grid items-center gap-12 lg:grid-cols-[1.2fr_1fr] lg:gap-20">
-              <div className="relative min-h-[460px] overflow-hidden rounded-xl shadow-xl sm:min-h-[540px]" data-testid="sourcing-image-frame">
-                <img ref={sourcingReveal.ref} src={images.fabrication} alt="Shipyard fabrication zone with vessel hull and gantry crane" className={`absolute inset-0 size-full object-cover transition duration-700 hover:scale-105 reveal-image ${sourcingReveal.visible ? "is-visible" : ""}`} data-testid="sourcing-image" />
-                <div className="absolute inset-0 bg-gradient-to-r from-[#0f172a]/60 via-transparent to-transparent" />
+              {/* Card: Marine Sourcing & Procurement (image) */}
+              <div className="relative min-h-[380px] overflow-hidden rounded-2xl shadow-sm" data-testid="sourcing-practice-section">
+                <img
+                  ref={sourcingReveal.ref}
+                  src={images.fabrication}
+                  alt="Shipyard fabrication zone with vessel hull and gantry crane"
+                  className={`absolute inset-0 size-full object-cover transition duration-700 hover:scale-105 reveal-image ${sourcingReveal.visible ? "is-visible" : ""}`}
+                  data-testid="sourcing-image"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a]/92 via-[#0f172a]/40 to-[#0f172a]/10" />
                 <div className="absolute left-5 top-5 flex items-center gap-2 rounded-full bg-black/30 px-3 py-1.5 font-mono text-[9px] tracking-[0.22em] text-white backdrop-blur-sm" data-testid="sourcing-image-label">
                   <span className="size-1.5 rounded-full bg-[#dc2626]" /> FABRICATION / INSPECTION
                 </div>
-                <div className="absolute bottom-5 right-5 font-mono text-[9px] tracking-[0.22em] text-white/60" data-testid="sourcing-image-index">01 — 02</div>
-              </div>
-              <div data-testid="sourcing-copy">
-                <h2 className="font-heading text-[clamp(2rem,4vw,3.5rem)] font-extrabold leading-[.95] tracking-[-0.04em] text-[#0f172a]" data-testid="sourcing-headline">Marine Sourcing &amp; Procurement</h2>
-                <p className="mt-6 text-[15px] leading-7 text-[#6b7280]" data-testid="sourcing-support">Marine procurement begins with understanding the requirement — its specifications, context and constraints.</p>
-                <p className="mt-5 text-base font-bold text-[#0f172a]" data-testid="sourcing-positioning">Nautix works from the requirement, not from a catalogue.</p>
-                <div className="mt-6 flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#dc2626]" data-testid="sourcing-discipline">
-                  <Minus className="size-4" /> Requirement-led procurement
+                <div className="absolute inset-x-0 bottom-0 flex flex-col p-8 sm:p-10">
+                  <p className="font-mono text-[9px] font-bold tracking-[0.22em] text-[#fca5a5]">PRACTICE 01</p>
+                  <h3 className="mt-4 font-heading text-2xl font-extrabold leading-tight tracking-[-0.04em] text-white sm:text-3xl" data-testid="sourcing-headline">
+                    Marine Sourcing<br />&amp; Procurement
+                  </h3>
+                  <p className="mt-3 max-w-sm text-sm leading-6 text-white/75" data-testid="sourcing-support">
+                    Requirement-led sourcing and procurement. We work from the requirement, not from a catalogue.
+                  </p>
+                  <a href="#contact" className="mt-6 inline-flex w-fit items-center gap-2 rounded border border-white/30 px-5 py-2.5 text-sm font-bold text-white backdrop-blur-sm transition hover:border-white hover:bg-white/10">
+                    Discuss a Requirement <MoveRight className="size-4" />
+                  </a>
                 </div>
-                <a href="#contact" className="mt-8 inline-flex items-center gap-2 rounded bg-[#dc2626] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#b91c1c]">
-                  Discuss a Requirement <MoveRight className="size-4" />
-                </a>
               </div>
             </div>
-          </div>
-        </section>
 
-        {/* ── VISUAL BREAK ───────────────────────────────────────────────────────── */}
-        <section className="relative flex min-h-[420px] items-center overflow-hidden bg-[#0f172a] text-white" data-testid="visual-break-section">
-          <img src={images.engineRoom} alt="Technical marine equipment and vessel systems" className="absolute inset-0 size-full object-cover opacity-20" data-testid="visual-break-image" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0f172a]/95 via-[#0f172a]/80 to-[#0f172a]/50" />
-          <div className="relative mx-auto w-full max-w-[1440px] px-5 py-24 sm:px-8 lg:px-12">
-            <div className="flex items-end justify-between gap-10" data-testid="visual-break-copy">
-              <div>
-                <p className="font-mono text-[10px] tracking-[0.28em] text-[#dc2626]" data-testid="visual-break-kicker">05 / MARINE DETAIL</p>
-                <h2 className="mt-6 font-heading text-[clamp(3rem,9vw,8rem)] font-extrabold leading-[.86] tracking-[-0.07em]" data-testid="visual-break-headline">
-                  Specification<br /><span className="text-[#dc2626]">matters.</span>
-                </h2>
+            {/* Row 2 — Requirements card */}
+            <div className="mt-5 rounded-2xl border border-[#e5e7eb] bg-white p-8 shadow-sm sm:p-10" data-testid="requirements-section">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="font-mono text-[9px] font-bold tracking-[0.22em] text-[#dc2626]">OUR SERVICES</p>
+                  <h3 className="mt-4 font-heading text-2xl font-extrabold leading-tight tracking-[-0.04em] text-[#0f172a] sm:text-3xl" data-testid="requirements-headline">
+                    Requirements Arrive<br />in Different Forms.
+                  </h3>
+                </div>
+                <p className="max-w-xs text-sm text-[#6b7280] sm:text-right" data-testid="requirements-support">Start with the requirement you have.</p>
               </div>
-              <div className="hidden max-w-[180px] pb-2 font-mono text-[9px] leading-5 tracking-[0.13em] text-white/40 sm:block" data-testid="visual-break-caption">MARINE / MARITIME / SHIPBUILDING</div>
-            </div>
-          </div>
-          {/* Decorative anchor circle */}
-          <div className="absolute right-14 top-1/2 hidden -translate-y-1/2 lg:block">
-            <div className="flex size-44 items-center justify-center rounded-full border border-[#dc2626]/25 bg-[#dc2626]/5">
-              <div className="flex size-28 items-center justify-center rounded-full border border-[#dc2626]/40 bg-[#dc2626]/15">
-                <Anchor className="size-10 text-[#dc2626]" />
+              <p className="mt-8 font-mono text-[9px] tracking-[0.22em] text-[#0f172a]/40" data-testid="requirements-instruction">SELECT HOW YOUR REQUIREMENT STARTS</p>
+              <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-testid="requirements-diagram">
+                {requirementTypes.map((item, index) => {
+                  const isSelected = form.requirement_type === item.key;
+                  const Icon = requirementIcons[item.key];
+                  return (
+                    <button
+                      key={item.key}
+                      onClick={() => selectRequirementType(item.key)}
+                      className={`group flex flex-col gap-4 rounded-xl border-2 bg-[#f8fafc] p-5 text-left transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${
+                        isSelected ? "border-[#dc2626] bg-white shadow-[#dc2626]/10" : "border-transparent hover:border-[#dc2626]/25 hover:bg-white"
+                      }`}
+                      data-testid={`requirement-form-${index + 1}`}
+                    >
+                      <div className={`flex size-10 items-center justify-center rounded-lg transition-colors duration-300 ${isSelected ? "bg-[#dc2626]" : "bg-[#fef2f2] group-hover:bg-[#dc2626]"}`}>
+                        <Icon className={`size-4 transition-colors duration-300 ${isSelected ? "text-white" : "text-[#dc2626] group-hover:text-white"}`} />
+                      </div>
+                      <div>
+                        <p className={`text-[11px] font-bold uppercase tracking-[0.12em] transition-colors duration-300 ${isSelected ? "text-[#dc2626]" : "text-[#0f172a] group-hover:text-[#dc2626]"}`} data-testid={`requirement-form-label-${index + 1}`}>{item.label}</p>
+                        <p className="mt-1.5 text-xs leading-5 text-[#6b7280] line-clamp-2">{item.requirementPlaceholder}</p>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
+
+            {/* Row 3 — Specification matters card */}
+            <div className="relative mt-5 overflow-hidden rounded-2xl bg-[#0f172a]" data-testid="visual-break-section">
+              <img src={images.engineRoom} alt="Technical marine equipment and vessel systems" className="absolute inset-0 size-full object-cover opacity-[0.14]" data-testid="visual-break-image" />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#0f172a] via-[#0f172a]/90 to-[#0f172a]/55" />
+              <div className="relative flex flex-col gap-8 p-8 sm:p-12 lg:flex-row lg:items-center lg:justify-between" data-testid="visual-break-copy">
+                <div>
+                  <p className="font-mono text-[10px] tracking-[0.28em] text-[#dc2626]" data-testid="visual-break-kicker">MARINE DETAIL</p>
+                  <h3 className="mt-5 font-heading text-[clamp(2.8rem,7vw,6rem)] font-extrabold leading-[.86] tracking-[-0.07em] text-white" data-testid="visual-break-headline">
+                    Specification<br /><span className="text-[#dc2626]">matters.</span>
+                  </h3>
+                </div>
+                <div className="flex size-36 shrink-0 items-center justify-center rounded-full border border-[#dc2626]/25 bg-[#dc2626]/5 lg:mr-8">
+                  <div className="flex size-24 items-center justify-center rounded-full border border-[#dc2626]/40 bg-[#dc2626]/15">
+                    <Anchor className="size-10 text-[#dc2626]" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </section>
 
@@ -507,7 +501,7 @@ export default function Home() {
           <div className="mx-auto grid max-w-[1440px] gap-16 px-5 sm:px-8 lg:grid-cols-[.9fr_1.1fr] lg:gap-24 lg:px-12">
             <div data-testid="contact-intro">
               <SectionMarker number="09" label="START A CONVERSATION" light />
-              <h2 className="mt-8 max-w-xl font-heading text-[clamp(3rem,7vw,6.5rem)] font-extrabold leading-[.9] tracking-[-0.06em]" data-testid="contact-headline">Have a marine requirement?</h2>
+              <h2 className="mt-8 max-w-xl font-heading text-[clamp(3rem,7vw,6.5rem)] font-extrabold leading-[.9] tracking-[-0.06em]" data-testid="contact-headline">Have a Requirement?</h2>
               <p className="mt-8 text-base font-semibold text-white/75" data-testid="contact-support">Start with what you have.</p>
               <p className="mt-16 hidden max-w-xs text-sm leading-7 text-white/45 lg:block" data-testid="contact-note">A specification, drawing, datasheet, BOM or a short description is enough to start the conversation.</p>
             </div>
