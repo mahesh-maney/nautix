@@ -457,9 +457,8 @@ export default function Home() {
             <div className="rounded-xl border border-[#e5e7eb] bg-white p-8 shadow-sm" data-testid="technology-disciplines">
               <div className="grid">
                 {["Custom Software", "Systems Integration", "Operational Applications"].map((item, index) => (
-                  <div className="flex items-center justify-between border-b border-[#f1f5f9] py-5 last:border-b-0" key={item} data-testid={`technology-discipline-${index + 1}`}>
+                  <div className="border-b border-[#f1f5f9] py-5 last:border-b-0" key={item} data-testid={`technology-discipline-${index + 1}`}>
                     <span className="text-base font-semibold text-[#0f172a]" data-testid={`technology-discipline-label-${index + 1}`}>{item}</span>
-                    <span className="font-mono text-[10px] text-[#9ca3af]" data-testid={`technology-discipline-number-${index + 1}`}>0{index + 1}</span>
                   </div>
                 ))}
               </div>
