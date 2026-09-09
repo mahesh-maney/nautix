@@ -1,22 +1,9 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { useMutation } from "@tanstack/react-query";
 import { ArrowUpRight, Check, FileText, Globe, Mail, MapPin, Menu, MoveRight, Phone, X, Shield, Zap, Anchor, Headphones, Package, Settings, Tag, Ruler, Briefcase } from "lucide-react";
-import { apiPostForm } from "@/lib/api";
+import { sendEnquiry } from "@/lib/emailService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-
-interface ContactSubmission {
-  id: string;
-  name: string;
-  company: string;
-  email: string;
-  requirement: string;
-  requirement_type: string | null;
-  attachment_name: string | null;
-  status: "new" | "in_review" | "complete";
-  created_at: string;
-}
 
 type RequirementTypeKey =
   | "part_reference"
@@ -162,22 +149,8 @@ export default function Home() {
     document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const mutation = useMutation<ContactSubmission, Error, ContactFormState>({
-    mutationFn: (payload) => {
-      const body = new FormData();
-      body.append("name", payload.name);
-      body.append("company", payload.company);
-      body.append("email", payload.email);
-      body.append("requirement", payload.requirement);
-      if (payload.requirement_type) body.append("requirement_type", payload.requirement_type);
-      if (payload.attachment) body.append("attachment", payload.attachment);
-      return apiPostForm<ContactSubmission>("/contact", body);
-    },
-    onSuccess: () => {
-      setForm(initialForm);
-      setSubmitted(true);
-    },
-  });
+  const [isPending, setIsPending] = useState(false);
+  const [isError, setIsError] = useState(false);
 
   const updateField = (field: "name" | "company" | "email" | "requirement", value: string) => {
     setSubmitted(false);
@@ -194,9 +167,19 @@ export default function Home() {
     setForm((current) => ({ ...current, attachment: file }));
   };
 
-  const submitForm = (event: FormEvent<HTMLFormElement>) => {
+  const submitForm = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    mutation.mutate(form);
+    setIsPending(true);
+    setIsError(false);
+    try {
+      await sendEnquiry(form);
+      setForm(initialForm);
+      setSubmitted(true);
+    } catch {
+      setIsError(true);
+    } finally {
+      setIsPending(false);
+    }
   };
 
   return (
@@ -537,11 +520,11 @@ export default function Home() {
                 </label>
               </div>
               <div className="mt-8 flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:justify-between" data-testid="contact-form-actions">
-                <Button type="submit" disabled={mutation.isPending} className="rounded bg-[#dc2626] px-6 py-3 text-sm font-bold text-white hover:bg-[#b91c1c]" data-testid="contact-submit-button">
-                  {mutation.isPending ? "Sending…" : "Discuss a Requirement"}<ArrowUpRight className="ml-2 size-4" data-testid="contact-submit-icon" />
+                <Button type="submit" disabled={isPending} className="rounded bg-[#dc2626] px-6 py-3 text-sm font-bold text-white hover:bg-[#b91c1c]" data-testid="contact-submit-button">
+                  {isPending ? "Sending…" : "Discuss a Requirement"}<ArrowUpRight className="ml-2 size-4" data-testid="contact-submit-icon" />
                 </Button>
                 {submitted && <p className="flex items-center gap-2 text-xs text-[#fca5a5]" role="status" data-testid="contact-success-message"><Check className="size-4" /> Requirement received. Thank you.</p>}
-                {mutation.isError && <p className="text-xs text-[#ffb4a9]" role="alert" data-testid="contact-error-message">Something went wrong. Please try again.</p>}
+                {isError && <p className="text-xs text-[#ffb4a9]" role="alert" data-testid="contact-error-message">Something went wrong. Please try again.</p>}
               </div>
             </form>
           </div>
